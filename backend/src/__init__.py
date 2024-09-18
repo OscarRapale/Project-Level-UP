@@ -11,9 +11,11 @@ jwt = JWTManager()
 bcrypt = Bcrypt()
 
 # Import all models here to ensure they are registered with SQLAlchemy
-
-
-
+from src.models.user import User
+from src.models.category import Category
+from src.models.preset_habit import PresetHabit
+from src.models.custom_habit import CustomHabit
+from src.models.habit_list import HabitList
 
 def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     """
@@ -53,15 +55,22 @@ def register_routes(app: Flask) -> None:
     """Import and register the routes for the Flask app"""
 
     #Importing the routes
-
-
-
-
+    from src.routes.users import users_bp
+    from src.routes.categories import categories_bp
+    from src.routes.preset_habits import preset_habit_bp
+    from src.routes.custom_habits import custom_habits_bp
+    from src.routes.habit_lists import habit_lists_bp
+    from src.routes.admin import admin_bp
+    from src.routes.auth import auth_bp
 
     # Register the blueprints in the app
-
-
-
+    app.register_blueprint(users_bp)
+    app.register_blueprint(categories_bp)
+    app.register_blueprint(preset_habit_bp)
+    app.register_blueprint(custom_habits_bp)
+    app.register_blueprint(habit_lists_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(auth_bp)
 
 def register_handlers(app: Flask) -> None:
     """Register the error handlers for the Flask app."""
