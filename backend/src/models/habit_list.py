@@ -1,7 +1,8 @@
+import pytz
 from . import db
 from src.models.user import User
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from flask import jsonify
 
 class HabitList(db.Model):
@@ -45,6 +46,7 @@ class HabitList(db.Model):
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }
+    
     def check_deadline_and_complete_habit(self, habit_list_item, xp_reward):
         """
         Check if the habit is completed before the daily deadline and update the habit status.
@@ -58,32 +60,45 @@ class HabitList(db.Model):
             xp_reward (int): The amount of XP to be rewarded for completing the habit.
         """
         from src.persistence import repo
+        est = pytz.timezone('US/Eastern')
+        now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+        now_est = now_utc.astimezone(est) # Change timezone to EST
 
-        now = datetime.utcnow()
-        deadline = datetime.combine(now.date(), datetime.max.time())
+        # Set the daily deadline to 12am
+        deadline_est = datetime.combine(now_est.date(), time(0, 0)).replace(tzinfo=est)
 
-        # Check if the habit is completed before the daily deadline
-        if now < deadline:
-            habit_list_item.habit_is_completed = True
-            self.completed_habits += 1
+        # Check if habit was added before the deadline
+        if habit_list_item.created_at.astimezone(est) < deadline_est:
 
-            # User gains XP
-            self.list_owner.gain_xp(xp_reward)
+            # Check if current time is past the deadline and habits is not completed
+            if now_est > deadline_est and not habit_list_item.habit_is_completed:
+               habit_list_item.is_late = True # Set is_late to True
 
-            # Recover user's HP if it has been decreased
-            self.list_owner.recover_hp(hp_points=15)
+            if habit_list_item.is_late:
+
+                # If habit is completed late
+                habit_list_item.habit_is_completed = True
+                self.completed_habits +=1
+
+                reduced_xp = int(xp_reward * 0.5) # Reduce XP reward by half
+                self.list_owner.gain_xp(reduced_xp) # User gains reduced XP
+
+            else:
+                # User completed the habits in time
+                habit_list_item.habit_is_completed = True
+                self.completed_habits += 1
+
+                self.list_owner.gain_xp(xp_reward) # Gain full XP reward
+                self.list_owner.recover_hp(hp_points=15) # Recover HP if User lost HP
 
         else:
+            # Habit was added after deadline
             habit_list_item.habit_is_completed = True
             self.completed_habits += 1
-            
-            # Habit completed late, reduce HP
-            self.list_owner.lose_hp(hp_points=15)
 
-            # Reduce XP for late completion (50% less XP)
-            reduced_xp = int(xp_reward * 0.5)
-            self.list_owner.gain_xp(reduced_xp)
-
+            self.list_owner.gain_xp(xp_reward)
+            self.list_owner.recover_hp(hp_points=15)
+       
         repo.save(self)
         repo.save(habit_list_item)
 
@@ -128,6 +143,45 @@ class HabitList(db.Model):
         # Handle deadline and completion
         self.check_deadline_and_complete_habit(habit_list_item,
                                                 habit_list_item.custom_habit.xp_reward)
+    
+    def check_incomplete_habits(self):
+        """
+        Check for incomplete habits and apply penalties.
+
+        This method checks if there are any incomplete habits for the current day.
+        If the current time is past the daily deadline (midnight EST), it iterates
+        through the habits and applies an HP penalty to the user for each incomplete habit.
+        """
+
+        from src.persistence import repo
+
+        now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+        est = pytz.timezone('US/Eastern')
+        now_est = now_utc.astimezone(est) # Change timezone to EST
+
+        # Check if the habits is completed before the daily deadline (12am)
+        deadline_est = datetime.combine(now_est.date(), time(0, 0)).replace(tzinfo=est)
+
+        if now_est > deadline_est:
+            # Flag to check if HP droped to 0
+            hp_is_zero = False
+
+            # Iterate through habits to check for incompletion
+            for habit_list_item in self.habits:
+                if not habit_list_item.habit_is_completed:
+                    # Habit was left incompleted
+                    self.list_owner.lose_hp(hp_points=25) # HP penalty for user
+
+                    # Check if HP dropped to 0
+                    if self.list_owner.hp == 0:
+                        hp_is_zero = True
+
+            # Apply XP penalty
+            if hp_is_zero:
+                self.list_owner.lose_xp(xp_points=50)
+
+        repo.save(self.list_owner)
+        repo.save(self)
 
     @staticmethod
     def create(data: dict) -> "HabitList":
@@ -167,13 +221,15 @@ class HabitList(db.Model):
 
         return habit_list
     
+    @classmethod
+    def get_by_user_id(cls, user_id: str):
+        return cls.query.filter_by(list_owner_id=user_id).all()
 
 class HabitListItem(db.Model):
     """
     The HabitListItem model represents an item in a habit list.
     Each item can be associated with either a preset habit or a custom habit.
     """
-
     __tablename__ = "habit_list_items"
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -181,6 +237,7 @@ class HabitListItem(db.Model):
     preset_habit_id = db.Column(db.String(36), db.ForeignKey("preset_habits.id"), nullable=True)
     custom_habit_id = db.Column(db.String(36), db.ForeignKey("custom_habits.id"), nullable=True)
     habit_is_completed = db.Column(db.Boolean, default=False)
+    is_late = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
 
@@ -189,7 +246,7 @@ class HabitListItem(db.Model):
     custom_habit = db.relationship("CustomHabit", back_populates="habit_lists")
 
     def __init__(self, habit_list_id: str, habit_is_completed: bool = False, preset_habit_id: str = None,
-                 custom_habit_id: str = None, **kw) -> None:
+                 custom_habit_id: str = None, is_late: bool = False, **kw) -> None:
         """
         Initialize a new HabitListItem.
 
@@ -203,6 +260,7 @@ class HabitListItem(db.Model):
         self.preset_habit_id = preset_habit_id
         self.custom_habit_id = custom_habit_id
         self.habit_is_completed = habit_is_completed
+        self.is_late = is_late
 
     def to_dict(self) -> dict:
         """
@@ -216,6 +274,7 @@ class HabitListItem(db.Model):
             "preset_habit_id": self.preset_habit_id,
             "custom_habit_id": self.custom_habit_id,
             "habit_is_completed": self.habit_is_completed,
+            "is_late": self.is_late,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }

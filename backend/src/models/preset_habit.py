@@ -1,4 +1,5 @@
 from . import db
+import random
 from src.models.category import Category
 
 class PresetHabit(db.Model):
@@ -22,7 +23,7 @@ class PresetHabit(db.Model):
         super().__init__(**kw)
         self.description = description
         self.category_name = category_name
-        self.xp_reward = 50
+        self.xp_reward = random.randint(75, 100)
 
     def __repr__(self) -> str:
         """
