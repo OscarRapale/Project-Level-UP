@@ -1,4 +1,5 @@
 from . import db
+import random
 from src.models.user import User
 
 class CustomHabit(db.Model):
@@ -22,7 +23,7 @@ class CustomHabit(db.Model):
         super().__init__(**kw)
         self.description = description
         self.habit_owner_id = habit_owner_id
-        self.xp_reward = 50
+        self.xp_reward = random.randint(75, 100)
 
     def __repr__(self) -> str:
         """
