@@ -45,7 +45,7 @@ def get_categories_habits(name: str):
     :param name: The name of the category to get the preset habits of.
     :return: The preset habits of the category.
     """
-        abort(404, f"Category with name {name} not found")
+    abort(404, f"Category with name {name} not found")
 
     return category.to_dict()
 
