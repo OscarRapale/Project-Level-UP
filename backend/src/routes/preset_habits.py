@@ -27,7 +27,6 @@ def create_preset_habit():
 
     :return: The created preset habit and a 201 status code.
     """
-
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
@@ -75,7 +74,6 @@ def update_preset_habit(preset_habit_id: str):
     :param preset_habit_id: The ID of the preset habit to update.
     :return: The updated preset habit.
     """
-
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403

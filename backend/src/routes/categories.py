@@ -14,7 +14,6 @@ def get_categories():
 
     :return: A list of all categories.
     """
-
     categories: list[Category] = Category.get_all()
 
     return [category.to_dict() for category in categories]
@@ -29,7 +28,6 @@ def get_categories_by_name(name: str):
     :param name: The name of the category to get.
     :return: The category.
     """
-
     category: Category | None = Category.get(name)
 
     if not category:
@@ -47,6 +45,9 @@ def get_categories_habits(name: str):
     :param name: The name of the category to get the preset habits of.
     :return: The preset habits of the category.
     """
+        abort(404, f"Category with name {name} not found")
+
+    return category.to_dict()
 
     category: Category | None = Category.get(name)
 
@@ -86,7 +87,6 @@ def create_category():
 
     except KeyError as e:
         abort(400, f"Missing field: {e}")
-
     except ValueError as e:
         abort(400, str(e))
 

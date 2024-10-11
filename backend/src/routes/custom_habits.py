@@ -27,7 +27,6 @@ def get_custom_habits():
 
     return [custom_habit.to_dict() for custom_habit in custom_habits], 200
 
-
 @custom_habits_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_custom_habits():
@@ -47,6 +46,7 @@ def create_custom_habits():
 
     try:
         custom_habit = CustomHabit.create(data)
+       
     except KeyError as e:
         abort(400, f"Missing field: {e}")
     except ValueError as e:
