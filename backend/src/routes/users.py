@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from flask import abort, request
 from src.models.user import User
 from sqlalchemy.exc import SQLAlchemyError
@@ -132,3 +132,18 @@ def delete_user(user_id: str):
         abort(500, f"Database error: {e}")
 
     return "", 204
+
+@users_bp.route("/leaderboard", methods=["GET"])
+def leaderboard():
+    """
+    Retrieve the leaderboard data.
+
+    This endpoint retrieves the top users for the leaderboard based on their level and XP.
+    It calls the `get_leaderboard` method of the `User` model to get the top users and returns
+    the data as a JSON response.
+
+    Returns:
+        Response: A JSON response containing the leaderboard data with a status code of 200.
+    """
+    leaderboard_data = User.get_leaderboard(limit=10)
+    return jsonify(leaderboard_data), 200
