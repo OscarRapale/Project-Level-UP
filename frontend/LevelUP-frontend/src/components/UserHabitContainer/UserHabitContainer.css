@@ -1,0 +1,19 @@
+#habits-box {
+    margin-top: 10px;
+
+}
+
+#habits-box:hover {
+    color: #DC143C;
+    text-decoration: underline;
+}
+
+#habits-description:hover {
+    color: #DC143C;
+}
+
+#list-select {
+    margin-bottom: 20px;
+}
+
+
