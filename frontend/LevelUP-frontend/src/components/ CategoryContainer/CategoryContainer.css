@@ -1,0 +1,23 @@
+#category-title {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+#category-name:hover {
+    color: #DC143C;
+    text-decoration: underline;
+}
+
+#habit-description:hover {
+    color: #DC143C;
+    text-decoration: underline;
+}
+
+#category-accordion {
+    margin-bottom: 40px;
+}
+
+#list-select{
+    text-align: center;
+    margin-top: 25px;
+}

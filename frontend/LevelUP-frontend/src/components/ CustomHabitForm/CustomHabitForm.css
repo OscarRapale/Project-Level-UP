@@ -1,0 +1,9 @@
+#new-habit-header {
+    margin-bottom: 20px;
+}
+
+#habitDescription {
+    margin-bottom: 20px;
+    width: 25rem;
+    border-color: #DC143C;
+}
