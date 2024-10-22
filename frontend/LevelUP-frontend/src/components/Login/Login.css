@@ -1,0 +1,35 @@
+/* Add this CSS to your stylesheet */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+   
+  }
+  
+.container {
+    max-width: 400px; /* Adjust the width as needed */
+    width: 100%;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+form .form-control {
+    width: 100%;
+}
+
+form .btn {
+    width: 20rem;
+    border-radius: 50rem;
+}
+
+.alert.alert-danger.mt-3 {
+    width: 25rem;
+    margin: 0 auto;
+  }

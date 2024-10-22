@@ -348,4 +348,5 @@ def complete_custom_habit(habit_list_id: str, habit_id: str):
         return jsonify({"msg": str(e)}), 400
 
     except Exception as e:
+
         return jsonify({"msg": f"An error occurred while completing the custom habit"}), 500

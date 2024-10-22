@@ -19,7 +19,6 @@ def get_categories():
 
     return [category.to_dict() for category in categories]
 
-
 @categories_bp.route("/<name>", methods=["GET"])
 def get_categories_by_name(name: str):
     """
@@ -37,21 +36,14 @@ def get_categories_by_name(name: str):
 
     return category.to_dict()
 
-
 @categories_bp.route("/<name>/preset_habits", methods=["GET"])
 def get_categories_habits(name: str):
     """
     Get the preset habits of a category.
 
-    This endpoint returns the preset habits of a category with the given name. If the category is not found, it aborts with a 404 status code.
-
     :param name: The name of the category to get the preset habits of.
     :return: The preset habits of the category.
     """
-    abort(404, f"Category with name {name} not found")
-
-    return category.to_dict()
-
     category: Category | None = Category.get(name)
 
     if not category:
@@ -64,7 +56,6 @@ def get_categories_habits(name: str):
     ]
 
     return category_items
-
 
 @categories_bp.route("/", methods=["POST"])
 @jwt_required()
@@ -95,7 +86,6 @@ def create_category():
         abort(400, str(e))
 
     return category.to_dict(), 201
-
 
 @categories_bp.route("/<name>", methods=["DELETE"])
 @jwt_required()
