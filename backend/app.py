@@ -1,11 +1,10 @@
 from src import create_app
 from src.config import get_config
+from flask_migrate import Migrate # works better with Docker
 from src.models import db
 
 app = create_app(get_config())
-
-with app.app_context():
-    db.create_all()  # Ensure the database tables are created
+migrate=Migrate(app,db) # Initialize Flask-Migrate
 
 if __name__ == "__main__":
     # Run the Flask development server

@@ -4,8 +4,12 @@ from src.models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 from src.persistence import repo
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from flask_bcrypt import Bcrypt
+from flask import jsonify
+from src import db
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
+bcrypt = Bcrypt()
 
 @users_bp.route("/", methods=["GET"])
 def get_users():
@@ -37,11 +41,31 @@ def create_user():
 
     data = request.get_json()
 
-    if "password" not in data:
-        abort(400, "Missing password field")
+    if "username" not in data or "password" not in data:
+        abort(400, "Missing username or password field")
+
+    email = data.get("email")
+    password = data["password"]
+    username = data["username"]
+    is_admin = data.get("is_admin",False)
+
+    # Hash the password
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    # Update the data with hashed password before creating the user
+    data["password_hash"] = hashed_password
 
     try:
-        user = User.create(data)
+        # Create a new User object, passing plain text password
+        new_user = User(
+            email=email,  # Assuming email is also part of the data
+            username=username,
+            password=password
+            # Include any additional fields needed for user creation
+            )
+        # Add and commit new user to the database
+        db.session.add(new_user)
+        db.session.commit()
 
     except KeyError as e:
         abort(400, f"Missing field: {e}")
@@ -52,10 +76,7 @@ def create_user():
     except SQLAlchemyError as e:
         abort(500, f"Database error: {e}")
 
-    if user is None:
-        abort(400, "User already exists")
-
-    return user.to_dict(), 201
+    return jsonify (new_user.to_dict()), 201
 
 @users_bp.route("/<user_id>", methods=["GET"])
 @jwt_required()
@@ -125,10 +146,14 @@ def delete_user(user_id: str):
     if not current_user.is_admin:
         abort(403, "You are not authorized to delete users.")
 
-    try:
-        if not User.delete(user_id):
-            abort(404, f"User with ID {user_id} not found")
-    except SQLAlchemyError as e:
-        abort(500, f"Database error: {e}")
+    user = User.query.get(user_id)
+    if not user:
+        abort(404, f"User with ID {user_id} not found")
 
-    return "", 204
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"msg":f"User with ID{user_id}deleted successfully"}), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        abort(500, f"Database error: {e}")
