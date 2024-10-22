@@ -14,7 +14,7 @@ def get_preset_habits():
     :return: A list of all preset habits.
     """
     preset_habits: list[PresetHabit] = PresetHabit.get_all()
-
+      
     return [preset_habit.to_dict() for preset_habit in preset_habits]
 
 @preset_habit_bp.route("/", methods=["POST"])
@@ -30,7 +30,7 @@ def create_preset_habit():
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
-    
+
     data = request.get_json()
 
     try:
@@ -77,10 +77,11 @@ def update_preset_habit(preset_habit_id: str):
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
-    
+
     data = request.get_json()
 
     try:
+
         preset_habit: PresetHabit | None = PresetHabit.update(preset_habit_id, data)
 
     except ValueError as e:
@@ -90,7 +91,7 @@ def update_preset_habit(preset_habit_id: str):
         abort(404, f"Habit with ID '{preset_habit_id}' not found")
 
     return preset_habit.to_dict()
-    
+
 @preset_habit_bp.route("/<preset_habit_id>", methods=["DELETE"])
 @jwt_required()
 def delete_preset_habit(preset_habit_id: str):
@@ -106,7 +107,7 @@ def delete_preset_habit(preset_habit_id: str):
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
-    
+
     if not PresetHabit.delete(preset_habit_id):
         abort(404, f"Habit with ID '{preset_habit_id}' not found")
 

@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 categories_bp = Blueprint("categories", __name__, url_prefix="/categories")
 
+
 @categories_bp.route("/", methods=["GET"])
 def get_categories():
     """
@@ -40,8 +41,6 @@ def get_categories_habits(name: str):
     """
     Get the preset habits of a category.
 
-    This endpoint returns the preset habits of a category with the given name. If the category is not found, it aborts with a 404 status code.
-
     :param name: The name of the category to get the preset habits of.
     :return: The preset habits of the category.
     """
@@ -71,7 +70,7 @@ def create_category():
 
     if get_jwt_identity() is None:
         return jsonify({"msg": "Please login first to access this page"})
-    
+
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
@@ -103,7 +102,7 @@ def delete_category(name: str):
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
-    
+
     if not Category.delete(name):
         abort(404, f"Category with name '{name}' not found")
 

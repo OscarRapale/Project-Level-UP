@@ -1,18 +1,14 @@
 services:
   app:
     build: .
+    working_dir: /app/src
     volumes:
-     - .:/app
+      - ./data:/app/data
     ports:
       - "5000:5000"
     environment:
-      - ENV=${ENV} # Using .env file
-    depends_on:
-      - db
-
-  db:
-    image: nouchka/sqlite3
-    volumes:
-      - ./data:/data
-    environment:
-      - DATABASE_URL=sqlite:///data/level_up.db
+      - DATABASE_URL=sqlite:////app/data/level_up.db
+      - ENV=${ENV}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - REPOSITORY=${REPOSITORY}
+    command: gunicorn -b 0.0.0.0:5000 app:app

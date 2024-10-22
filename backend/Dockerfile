@@ -1,8 +1,11 @@
 # Python image from the Docker Hub
-FROM python:3.10 as build-stage
+FROM python:3.10
+
+# Install sqlite3
+RUN apt-get update && apt-get install -y sqlite3
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /app/src
 
 # Copy requirements.txt first for better caching
 COPY requirements.txt .
@@ -15,7 +18,7 @@ COPY . .
 
 # Set environment variables
 ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
+ENV FLASK_ENV=development
 # Prevents Python from writing pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
 # Ensures Python output is logged in real-time

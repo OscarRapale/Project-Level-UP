@@ -5,14 +5,16 @@ from src.models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
-custom_habits_bp = Blueprint("custom_habits", __name__, url_prefix="/custom_habits")
+custom_habits_bp = Blueprint(
+    "custom_habits", __name__, url_prefix="/custom_habits")
+
 
 @custom_habits_bp.route("/", methods=["GET"])
 @jwt_required()
 def get_custom_habits():
     """
     Get all custom habits.
-
+    
     This endpoint retrieves all custom habits. It requires a valid JWT token for authentication
     and administration rights.
     
@@ -22,7 +24,7 @@ def get_custom_habits():
     claims = get_jwt()
     if not claims.get('is_admin'):
         return jsonify({"msg": "Administration rights required"}), 403
-    
+
     custom_habits: list[CustomHabit] = CustomHabit.get_all()
 
     return [custom_habit.to_dict() for custom_habit in custom_habits], 200
@@ -46,7 +48,7 @@ def create_custom_habits():
 
     try:
         custom_habit = CustomHabit.create(data)
-       
+        
     except KeyError as e:
         abort(400, f"Missing field: {e}")
     except ValueError as e:
@@ -59,6 +61,7 @@ def create_custom_habits():
 def get_custom_habits_by_id(custom_habit_id: str):
     """
     Get a custom habit by ID.
+
 
     This endpoint retrieves a custom habit by its ID. It requires a valid JWT token for authentication.
 
@@ -84,6 +87,7 @@ def update_custom_habits(custom_habit_id: str):
 
     This endpoint updates a custom habit. It requires a valid JWT token for authentication.
 
+
     Args:
         custom_habit_id (str): The ID of the custom habit to update.
 
@@ -104,6 +108,7 @@ def update_custom_habits(custom_habit_id: str):
 
     try:
         custom_habit: CustomHabit | None = CustomHabit.update(custom_habit_id, data)
+  
     except ValueError as e:
         abort(400, str(e))
 
@@ -122,9 +127,6 @@ def get_user_custom_habits():
     """
     current_user_id = get_jwt_identity()
     custom_habits: list[CustomHabit] = CustomHabit.query.filter_by(habit_owner_id=current_user_id).all()
-
-    return jsonify([custom_habit.to_dict() for custom_habit in custom_habits]), 200
-
 
 @custom_habits_bp.route("/<custom_habit_id>", methods=["DELETE"])
 @jwt_required()
