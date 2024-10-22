@@ -102,6 +102,52 @@ class HabitList(db.Model):
         repo.save(self)
         repo.save(habit_list_item)
 
+    def check_incomplete_habits(self):
+        """
+        Check for incomplete habits and apply penalties.
+
+        This method checks if there are any incomplete habits for the current day.
+        If the current time is past the daily deadline (midnight EST), it iterates
+        through the habits and applies an HP penalty to the user for each incomplete habit.
+        """
+        from src.persistence import repo
+
+        now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+        est = pytz.timezone('US/Eastern')
+        now_est = now_utc.astimezone(est)  # Change timezone to EST
+
+        # Set the daily deadline to midnight EST
+        deadline_est = datetime.combine(now_est.date(), time(0, 0)).replace(tzinfo=est)
+
+        # Check if the current time is past the deadline
+        if now_est > deadline_est:
+            # Check if penalties have already been applied today
+            if self.list_owner.last_login and self.list_owner.last_login.date() >= now_est.date():
+                return
+
+            # Flag to check if HP dropped to 0
+            hp_is_zero = False
+
+            # Iterate through habits to check for incompletion
+            for habit_list_item in self.habits:
+                if not habit_list_item.habit_is_completed:
+                    # Habit was left incomplete
+                    self.list_owner.lose_hp(hp_points=25)  # HP penalty for user
+
+                    # Check if HP dropped to 0
+                    if self.list_owner.hp == 0:
+                        hp_is_zero = True
+
+            # Apply XP penalty
+            if hp_is_zero:
+                self.list_owner.lose_xp(xp_points=50)
+
+            # Update the last login date to indicate penalties have been applied
+            self.list_owner.last_login = now_est
+
+        repo.save(self.list_owner)
+        repo.save(self)
+
     def complete_preset_habit(self, habit_id):
         """
         Complete a preset habit in the habit list.
@@ -144,44 +190,6 @@ class HabitList(db.Model):
         self.check_deadline_and_complete_habit(habit_list_item,
                                                 habit_list_item.custom_habit.xp_reward)
     
-    def check_incomplete_habits(self):
-        """
-        Check for incomplete habits and apply penalties.
-
-        This method checks if there are any incomplete habits for the current day.
-        If the current time is past the daily deadline (midnight EST), it iterates
-        through the habits and applies an HP penalty to the user for each incomplete habit.
-        """
-
-        from src.persistence import repo
-
-        now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
-        est = pytz.timezone('US/Eastern')
-        now_est = now_utc.astimezone(est) # Change timezone to EST
-
-        # Check if the habits is completed before the daily deadline (12am)
-        deadline_est = datetime.combine(now_est.date(), time(0, 0)).replace(tzinfo=est)
-
-        if now_est > deadline_est:
-            # Flag to check if HP droped to 0
-            hp_is_zero = False
-
-            # Iterate through habits to check for incompletion
-            for habit_list_item in self.habits:
-                if not habit_list_item.habit_is_completed:
-                    # Habit was left incompleted
-                    self.list_owner.lose_hp(hp_points=25) # HP penalty for user
-
-                    # Check if HP dropped to 0
-                    if self.list_owner.hp == 0:
-                        hp_is_zero = True
-
-            # Apply XP penalty
-            if hp_is_zero:
-                self.list_owner.lose_xp(xp_points=50)
-
-        repo.save(self.list_owner)
-        repo.save(self)
 
     @staticmethod
     def create(data: dict) -> "HabitList":
