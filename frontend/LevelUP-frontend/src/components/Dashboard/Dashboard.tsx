@@ -2,20 +2,18 @@ import { Grid, GridItem, Box } from "@chakra-ui/react";
 import React from "react";
 import CategoryContainer from "../ CategoryContainer/CategoryContainer";
 import UserHabitContainer from "../UserHabitContainer/UserHabitContainer";
-import HabitList from "../HabitList";
-import CreateHabitList from "../CreateHabitList/CreateHabitList";
 import CustomHabitForm from "../ CustomHabitForm/CustomHabitForm";
+import UserCard from "../UserCard/UserCard";
 import "./Dashboard.css";
+import HabitListContainer from "../HabitListContainer";
 
 const Dashboard: React.FC = () => {
-  const handleHabitListCreated = (id: string) => {
-    console.log("Habit list created with ID:", id);
-  };
 
   return (
     <Grid
       templateAreas={`
         "createHabitList createHabitList"
+        "habitList userCard"
         "habitList category"
         "habitList customHabitForm"
         "habitList userHabits"
@@ -26,30 +24,13 @@ const Dashboard: React.FC = () => {
       alignItems="start"
       justifyContent="center"
     >
-      <GridItem area={"createHabitList"}>
-        <Box
-          bg="#333"
-          p={4}
-          borderRadius="lg"
-          boxShadow="lg"
-          _hover={{ boxShadow: "lg" }}
-          w="20%"
-          h="auto"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          margin="0 auto"
-        >
-          <CreateHabitList onHabitListCreated={handleHabitListCreated} />
-        </Box>
-      </GridItem>
       <GridItem area={"habitList"}>
         <Box
           bg="#333"
           p={4}
-          borderRadius="lg"
-          boxShadow="lg"
-          _hover={{ boxShadow: "lg" }}
+          borderRadius="2xl"
+          boxShadow="2xl"
+          _hover={{ boxShadow: "2xl" }}
           w="70%"
           h="auto"
           maxH=""
@@ -59,17 +40,21 @@ const Dashboard: React.FC = () => {
           margin="0 auto"
           color="white"
           marginLeft="20rem"
+          marginTop="10rem"
         >
-          <HabitList />
+          <HabitListContainer />
         </Box>
+      </GridItem>
+      <GridItem area="userCard">
+        <UserCard />
       </GridItem>
       <GridItem area={"category"}>
         <Box
           bg="#333"
           p={4}
-          borderRadius="md"
-          boxShadow={"lg"}
-          _hover={{ boxShadow: "lg" }}
+          borderRadius="2xl"
+          boxShadow={"2xl"}
+          _hover={{ boxShadow: "2xl" }}
           w="80%"
           h="auto"
           display="flex"
@@ -85,9 +70,9 @@ const Dashboard: React.FC = () => {
         <Box
           bg="#333"
           p={4}
-          borderRadius="md"
-          boxShadow="lg"
-          _hover={{ boxShadow: "lg" }}
+          borderRadius="2xl"
+          boxShadow="2xl"
+          _hover={{ boxShadow: "2xl" }}
           w="75%"
           h="auto"
           display="flex"
@@ -103,9 +88,9 @@ const Dashboard: React.FC = () => {
         <Box
           bg="#333"
           p={4}
-          borderRadius="md"
-          boxShadow="lg"
-          _hover={{ boxShadow: "lg" }}
+          borderRadius="2xl"
+          boxShadow="2xl"
+          _hover={{ boxShadow: "2xl" }}
           w="75%"
           h="auto"
           display="flex"
