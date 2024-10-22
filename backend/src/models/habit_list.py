@@ -229,6 +229,28 @@ class HabitList(db.Model):
 
         return habit_list
     
+    @staticmethod
+    def delete(habit_list_id: str) -> bool:
+        """
+        Delete a HabitList instance from the database.
+
+        Args:
+            habit_list_id (str): The ID of the habit list to be deleted.
+
+        Returns:
+            bool: True if the habit list was deleted, False if not found.
+        """
+        from src.persistence import repo
+
+        habit_list: HabitList | None = HabitList.get(habit_list_id)
+
+        if not habit_list:
+            return False
+        
+        repo.delete(habit_list)
+
+        return True
+
     @classmethod
     def get_by_user_id(cls, user_id: str):
         return cls.query.filter_by(list_owner_id=user_id).all()
