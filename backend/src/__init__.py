@@ -3,12 +3,14 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask import Flask
 from flask_cors import CORS
+from flask_socketio import SocketIO
 from dotenv import load_dotenv
 
 cors = CORS()
 
 jwt = JWTManager()
 bcrypt = Bcrypt()
+socketio = SocketIO()
 
 # Import all models here to ensure they are registered with SQLAlchemy
 from src.models.user import User
@@ -33,6 +35,7 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     register_extensions(app)
     register_routes(app)
