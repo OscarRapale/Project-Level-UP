@@ -109,9 +109,9 @@ class User(db.Model):
         # User stats will grow as they level up
         self.max_hp += 10
         self.strenght += 5
-        self.vitality += 5
+        self.vitality += 4
         self.dexterity += 3
-        self.intelligence += 3
+        self.intelligence += 2
         self.luck += 1
         self.xp_to_next_level = self.calculate_xp_to_next_level() # Calculate and increase xp needed for next level.
         repo.save(self)
@@ -216,6 +216,11 @@ class User(db.Model):
             "xp_to_next_level": self.xp_to_next_level,
             "habits_completed": self.habits_completed,
             "streak": self.streak,
+            "strenght": self.strenght,
+            "vitality": self.vitality,
+            "dexterity": self.dexterity,
+            "intelligence": self.intelligence,
+            "luck": self.luck,
             "last_login": self.last_login,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
@@ -244,7 +249,7 @@ class User(db.Model):
         )
 
         leaderboard = [
-            {"Username": user.username, "Level": user.level, "XP": user.current_xp}
+            {"id": user.id, "username": user.username, "level": user.level, "XP": user.current_xp}
             for user in top_users
         ]
 
@@ -285,10 +290,12 @@ class User(db.Model):
         
         if "email" in data:
             user.email = data["email"]
-        if "password" in data:
-            user.set_password(data["password"])
         if "username" in data:
             user.username = data["username"]
+        if "currentPassword" in data and "newPassword" in data:
+            if not user.check_password(data["currentPassword"]):
+                raise ValueError("Current password is incorrect")
+            user.set_password(data["newPassword"])
 
         repo.update(user)
 
