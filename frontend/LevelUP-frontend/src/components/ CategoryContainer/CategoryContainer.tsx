@@ -137,7 +137,7 @@ const CategoryContainer: React.FC = () => {
 
   return (
     <div>
-      <h2 id="category-title">CATEGORIES</h2>
+      <h2 id="category-title">Categories</h2>
       {categoryLoading && <div>Loading...</div>}
       {categoryError && <div>{categoryError}</div>}
       <Accordion allowToggle id="category-accordion">
