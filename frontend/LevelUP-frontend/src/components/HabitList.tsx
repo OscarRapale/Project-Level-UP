@@ -1,35 +1,25 @@
 import { useEffect, useState } from "react";
 import useHttpRequest from "../hooks/useHttpRequest";
 import { useParams } from "react-router-dom";
+import { io } from "socket.io-client";
+import { Habit, HabitList } from "./types";
 
-interface Habit {
-  id: string;
-  description: string;
-  type: "preset" | "custom";
+interface HabitListComponentProps {
+  habitLists: HabitList[];
+  setHabitLists: React.Dispatch<React.SetStateAction<HabitList[]>>;
+  onHabitListDeleted: (id: string) => void;
 }
 
-interface HabitList {
-  id: string;
-  name: string;
-}
-
-const HabitList: React.FC = () => {
+const HabitListComponent: React.FC<HabitListComponentProps> = ({
+  habitLists,
+  setHabitLists,
+  onHabitListDeleted,
+}) => {
   const { habitListId } = useParams<{ habitListId: string }>();
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [habitLists, setHabitLists] = useState<HabitList[]>([]);
   const [selectedHabitListId, setSelectedHabitListId] = useState<string | null>(
     habitListId || null
   );
-
-  const {
-    data: habitListData,
-    loading: habitListLoading,
-    error: habitListError,
-    sendRequest: fetchHabitLists,
-  } = useHttpRequest<HabitList[], unknown>({
-    url: "http://127.0.0.1:5000/habit_lists/user",
-    method: "GET",
-  });
 
   const {
     data: presetData,
@@ -55,13 +45,17 @@ const HabitList: React.FC = () => {
     unknown,
     unknown
   >({
-    url: "", // This will be dynamically set later
+    url: "", // This will be dynamically set
     method: "POST",
   });
 
-  useEffect(() => {
-    fetchHabitLists();
-  }, [fetchHabitLists]);
+  const { sendRequest: deleteHabitListRequest } = useHttpRequest<
+    unknown,
+    unknown
+  >({
+    url: "", // This will be dynamically set
+    method: "DELETE",
+  });
 
   useEffect(() => {
     if (selectedHabitListId) {
@@ -85,10 +79,33 @@ const HabitList: React.FC = () => {
   }, [presetData, customData]);
 
   useEffect(() => {
-    if (habitListData) {
-      setHabitLists(habitListData);
-    }
-  }, [habitListData]);
+    const socket = io("http://127.0.0.1:5000");
+
+    socket.on("connect", () => {
+      console.log("Connected to WebSocket server");
+    });
+
+    socket.on("habit_list_update", (data: { habit_list_id: string; habit_list_data: HabitList }) => {
+      console.log("Received habit_list_update event", data);
+      if (data.habit_list_id === selectedHabitListId) {
+        setHabitLists((prevLists) =>
+          prevLists.map((list) =>
+            list.id === data.habit_list_id ? data.habit_list_data : list
+          )
+        );
+        console.log("Updated habit list data:", data.habit_list_data.habits);
+        setHabits(data.habit_list_data.habits || []);
+      }
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from WebSocket server");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [selectedHabitListId, setHabitLists]);
 
   const handleCompleteHabit = async (
     habitId: string,
@@ -105,36 +122,47 @@ const HabitList: React.FC = () => {
     }
   };
 
+  const handleDeleteHabitList = async (habitListId: string) => {
+    const url = `http://127.0.0.1:5000/habit_lists/${habitListId}`;
+    try {
+      await deleteHabitListRequest({ url });
+      onHabitListDeleted(habitListId);
+      if (selectedHabitListId === habitListId) {
+        setSelectedHabitListId(null);
+        setHabits([]);
+      }
+    } catch (error) {
+      console.error("Error deleting habit list:", error);
+    }
+  };
+
   return (
     <div className="container">
-      <h2 className="my-4">All Habits</h2>
+      <h2
+        className="my-4"
+        style={{ fontFamily: "'Orbitron', 'Exo 2', 'Lexend'" }}
+      >
+        All Habits
+      </h2>
       <div className="mb-3">
         <label htmlFor="habitListSelect" className="form-label">
           Select Habit List:
         </label>
-        {habitListLoading && (
-          <div className="alert alert-info">Loading lists...</div>
-        )}
-        {habitListError && (
-          <div className="alert alert-danger">{habitListError}</div>
-        )}
-        {!habitListLoading && !habitListError && (
-          <select
-            id="habitListSelect"
-            className="form-select"
-            value={selectedHabitListId || ""}
-            onChange={(e) => setSelectedHabitListId(e.target.value)}
-          >
-            <option value="" disabled>
-              Select a habit list
+        <select
+          id="habitListSelect"
+          className="form-select"
+          value={selectedHabitListId || ""}
+          onChange={(e) => setSelectedHabitListId(e.target.value)}
+        >
+          <option value="" disabled>
+            Select a habit list
+          </option>
+          {habitLists.map((list) => (
+            <option key={list.id} value={list.id}>
+              {list.name}
             </option>
-            {habitLists.map((list) => (
-              <option key={list.id} value={list.id}>
-                {list.name}
-              </option>
-            ))}
-          </select>
-        )}
+          ))}
+        </select>
       </div>
       {(presetLoading || customLoading) && (
         <div className="alert alert-info">Loading...</div>
@@ -142,7 +170,7 @@ const HabitList: React.FC = () => {
       {(presetError || customError) && (
         <div className="alert alert-danger">{presetError || customError}</div>
       )}
-      <ul className="list-group">
+      <ul className="list-group" style={{ width: "130%", height: "auto" }}>
         {habits.length > 0 ? (
           habits.map((habit) => (
             <li
@@ -162,8 +190,30 @@ const HabitList: React.FC = () => {
           <li className="list-group-item">No habits found for this list.</li>
         )}
       </ul>
+      <h3
+        className="my-4"
+        style={{ fontFamily: "'Orbitron', 'Exo 2', 'Lexend'" }}
+      >
+        Delete Habit Lists
+      </h3>
+      <ul className="list-group mt-3">
+        {habitLists.map((list) => (
+          <li
+            key={list.id}
+            className="list-group-item d-flex justify-content-between align-items-center"
+          >
+            <span>{list.name}</span>
+            <button
+              className="btn btn-outline-danger"
+              onClick={() => handleDeleteHabitList(list.id)}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-export default HabitList;
+export default HabitListComponent;
