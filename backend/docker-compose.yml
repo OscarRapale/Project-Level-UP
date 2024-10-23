@@ -13,3 +13,13 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - REPOSITORY=${REPOSITORY}
     command: gunicorn -b 0.0.0.0:5000 app:app
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NODE_ENV=development
