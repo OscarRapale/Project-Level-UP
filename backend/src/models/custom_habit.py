@@ -55,14 +55,14 @@ class CustomHabit(db.Model):
 
         if not user:
             raise ValueError(f"User with ID {data['habit_owner_id']} not found")
-        
+
         new_custom_habit = CustomHabit(description=data["description"], habit_owner_id=data["habit_owner_id"])
 
         db.session.add(new_custom_habit)
         db.session.commit()
 
         return new_custom_habit
-    
+
     @staticmethod
     def update(custom_habit_id: str, data: dict) -> "CustomHabit | None":
         """
@@ -74,10 +74,27 @@ class CustomHabit(db.Model):
 
         if not custom_habit:
             return None
-        
+
         for key, value in data.items():
             setattr(custom_habit, key, value)
 
         repo.update(custom_habit)
 
         return custom_habit
+
+    @staticmethod
+    def delete(custom_habit_id: str) -> bool:
+        """
+        Delete a CustomHabit instance from the database.
+        Args:
+            custom_habit_id (str): The ID of the custom habit to be deleted.
+        Returns:
+            bool: True if the custom habit was deleted, False if not found.
+        """
+        from src.persistence import repo
+        custom_habit: CustomHabit | None = CustomHabit.get(custom_habit_id)
+        if not custom_habit:
+            return False
+
+        repo.delete(custom_habit)
+        return True

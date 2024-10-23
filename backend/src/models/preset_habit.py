@@ -55,7 +55,7 @@ class PresetHabit(db.Model):
 
         if not category:
             raise ValueError("Category not found")
-        
+
         preset_habit = PresetHabit(**data)
         repo.save(preset_habit)
 
@@ -72,10 +72,27 @@ class PresetHabit(db.Model):
 
         if not preset_habit:
             raise ValueError("Habit not found")
-        
+
         for key, value in data.items():
             setattr(preset_habit, key, value)
 
         repo.update(preset_habit)
 
         return preset_habit
+
+    @staticmethod
+    def delete(preset_habit_id: str) -> bool:
+        """
+        Delete a PresetHabit instance from the database.
+        Args:
+            preset_habit_id (str): The ID of the preset habit to be deleted.
+        Returns:
+            bool: True if the preset habit was deleted, False if not found.
+        """
+        from src.persistence import repo
+        preset_habit: PresetHabit | None = PresetHabit.get(preset_habit_id)
+        if not preset_habit:
+            return False
+
+        repo.delete(preset_habit)
+        return True

@@ -300,3 +300,20 @@ class User(db.Model):
         repo.update(user)
 
         return user
+
+@staticmethod
+def delete(user_id: str) -> bool:
+        """
+        Delete a User instance from the database.
+        Args:
+            user_id (str): The ID of the user to be deleted.
+        Returns:
+            bool: True if the user was deleted, False if not found.
+        """
+        from src.persistence import repo
+        user: User | None = User.get(user_id)
+        if not user:
+            return False
+
+        repo.delete(user)
+        return True
