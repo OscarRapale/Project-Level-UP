@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify
-from flask import Blueprint, jsonify
 from flask import abort, request
 from src.models.user import User
 from sqlalchemy.exc import SQLAlchemyError
@@ -57,7 +56,6 @@ def create_user():
 
     :return: The created user and a 201 status code.
     """
-
     data = request.get_json()
 
     if "password" not in data:
@@ -156,7 +154,7 @@ def update_user(user_id: str):
 @jwt_required()
 def delete_user(user_id: str):
     """Deletes a user by ID"""
-
+    
     current_user_id = get_jwt_identity()
     current_user = User.get(current_user_id)
 
@@ -164,16 +162,11 @@ def delete_user(user_id: str):
     if not current_user.is_admin:
         abort(403, "You are not authorized to delete users.")
 
-    user = User.query.get(user_id)
-    if not user:
-        abort(404, f"User with ID {user_id} not found")
-
     try:
         db.session.delete(user)
         db.session.commit()
         return jsonify({"msg":f"User with ID{user_id}deleted successfully"}), 200
     except SQLAlchemyError as e:
-        db.session.rollback()
         abort(500, f"Database error: {e}")
     return "", 204
 

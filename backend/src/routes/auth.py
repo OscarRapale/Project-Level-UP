@@ -29,6 +29,7 @@ def login():
         access_token = create_access_token(identity=user.id, additional_claims=additional_claims,
                                            expires_delta=False) # Token does not expires while in Development
         user.check_daily_streak()  # Update user streak and login count
-        return jsonify(access_token=access_token, user_id=user.id), 200
+
+        return jsonify(access_token=access_token, user_id=user.id ), 200
 
     return jsonify({"msg": "Bad email or password"}), 401

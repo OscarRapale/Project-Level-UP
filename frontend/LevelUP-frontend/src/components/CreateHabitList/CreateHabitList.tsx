@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import useHttpRequest from "../../hooks/useHttpRequest";
-import "./CreateHabitList.css"
+import "./CreateHabitList.css";
 
 interface CreateHabitListProps {
-  onHabitListCreated: (id: string) => void;
+  onHabitListCreated: (id: string, name: string) => void;
 }
 
 const CreateHabitList: React.FC<CreateHabitListProps> = ({
@@ -21,7 +21,7 @@ const CreateHabitList: React.FC<CreateHabitListProps> = ({
     event.preventDefault();
     try {
       const response = await sendRequest();
-      onHabitListCreated(response.id);
+      onHabitListCreated(response.id, habitListName);
       setHabitListName("");
       setError(null);
     } catch {
@@ -41,10 +41,12 @@ const CreateHabitList: React.FC<CreateHabitListProps> = ({
           required
         />
         <button 
-        id="create-btn"
-        type="submit"
-        className="btn btn-outline-danger complete-button"
-        >Create Habit List</button>
+          id="create-btn"
+          type="submit"
+          className="btn btn-outline-danger complete-button"
+        >
+          Create Habit List
+        </button>
       </form>
       {error && <div className="alert alert-danger mt-3">{error}</div>}
     </div>

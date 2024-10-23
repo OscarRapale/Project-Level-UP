@@ -1,9 +1,15 @@
 #new-habit-header {
     margin-bottom: 20px;
+    font-family: 'Orbitron', "Exo 2", "Lexend";
 }
 
 #habitDescription {
     margin-bottom: 20px;
     width: 25rem;
     border-color: #DC143C;
+}
+
+#create-habit-btn {
+    margin-top: 5px;
+    margin-bottom: 30px;
 }
