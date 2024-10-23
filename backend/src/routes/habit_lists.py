@@ -81,7 +81,12 @@ def create_habit_list():
     except ValueError as e:
         abort(404, str(e))
 
-    return habit_list.to_dict(), 201
+    habit_list_data = habit_list.to_dict()
+    habit_list_data_serialized = json.loads(json.dumps(habit_list_data, default=default_serializer))
+
+    socketio.emit("habit_list_created", habit_list_data_serialized)
+
+    return habit_list_data, 201
 
 @habit_lists_bp.route("/<habit_list_id>", methods=["GET"])
 @jwt_required()
