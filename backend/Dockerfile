@@ -27,5 +27,5 @@ ENV PYTHONUNBUFFERED=1
 # Expose the port your app runs on (e.g., 5000 for Flask)
 EXPOSE 5000
 
-# Use Gunicorn to run Flask app
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app.app"]
+# Command to run your Flask-SocketIO application
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "src:socketio_app"]

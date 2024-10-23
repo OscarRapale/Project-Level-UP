@@ -189,7 +189,6 @@ class HabitList(db.Model):
         # Handle deadline and completion
         self.check_deadline_and_complete_habit(habit_list_item,
                                                 habit_list_item.custom_habit.xp_reward)
-    
 
     @staticmethod
     def create(data: dict) -> "HabitList":
@@ -247,6 +246,28 @@ class HabitList(db.Model):
         if not habit_list:
             return False
         
+        repo.delete(habit_list)
+
+        return True
+
+    @staticmethod
+    def delete(habit_list_id: str) -> bool:
+        """
+        Delete a HabitList instance from the database.
+
+        Args:
+            habit_list_id (str): The ID of the habit list to be deleted.
+
+        Returns:
+            bool: True if the habit list was deleted, False if not found.
+        """
+        from src.persistence import repo
+
+        habit_list: HabitList | None = HabitList.get(habit_list_id)
+
+        if not habit_list:
+            return False
+
         repo.delete(habit_list)
 
         return True

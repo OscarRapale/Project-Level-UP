@@ -8,4 +8,4 @@ migrate=Migrate(app,db) # Initialize Flask-Migrate
 
 if __name__ == "__main__":
     # Run the Flask development server with SocketIO support
-    socketio.run(app, debug=app.config['DEBUG'])
+    socketio.run(app, host='0.0.0.0', port=5000)

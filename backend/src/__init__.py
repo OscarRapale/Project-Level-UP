@@ -5,6 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
+from src.models import db
 
 cors = CORS()
 
@@ -35,7 +36,8 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    cors.init_app(app)
+    socketio.init_app(app)
 
     register_extensions(app)
     register_routes(app)
