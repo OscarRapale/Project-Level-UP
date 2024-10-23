@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify
 from flask import abort, request
 from src.models.user import User
 from sqlalchemy.exc import SQLAlchemyError

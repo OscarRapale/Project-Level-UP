@@ -2,9 +2,7 @@ from flask import abort, request, jsonify, Blueprint
 from src.models.preset_habit import PresetHabit
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
-preset_habit_bp = Blueprint(
-    "preset_habits", __name__, url_prefix="/preset_habits")
-
+preset_habit_bp = Blueprint("preset_habits", __name__, url_prefix="/preset_habits")
 
 @preset_habit_bp.route("/", methods=["GET"])
 def get_preset_habits():
@@ -16,9 +14,8 @@ def get_preset_habits():
     :return: A list of all preset habits.
     """
     preset_habits: list[PresetHabit] = PresetHabit.get_all()
-
+      
     return [preset_habit.to_dict() for preset_habit in preset_habits]
-
 
 @preset_habit_bp.route("/", methods=["POST"])
 @jwt_required()
@@ -47,7 +44,6 @@ def create_preset_habit():
 
     return preset_habit.to_dict(), 201
 
-
 @preset_habit_bp.route("/<preset_habit_id>", methods=["GET"])
 @jwt_required()
 def get_preset_habits_by_id(preset_habit_id: str):
@@ -67,7 +63,6 @@ def get_preset_habits_by_id(preset_habit_id: str):
 
     return preset_habit.to_dict()
 
-
 @preset_habit_bp.route("/<preset_habit_id>", methods=["PUT"])
 @jwt_required()
 def update_preset_habit(preset_habit_id: str):
@@ -86,8 +81,8 @@ def update_preset_habit(preset_habit_id: str):
     data = request.get_json()
 
     try:
-        preset_habit: PresetHabit | None = PresetHabit.update(
-            preset_habit_id, data)
+
+        preset_habit: PresetHabit | None = PresetHabit.update(preset_habit_id, data)
 
     except ValueError as e:
         abort(400, str(e))
@@ -96,7 +91,6 @@ def update_preset_habit(preset_habit_id: str):
         abort(404, f"Habit with ID '{preset_habit_id}' not found")
 
     return preset_habit.to_dict()
-
 
 @preset_habit_bp.route("/<preset_habit_id>", methods=["DELETE"])
 @jwt_required()

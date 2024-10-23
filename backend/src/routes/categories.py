@@ -40,8 +40,6 @@ def get_categories_habits(name: str):
     """
     Get the preset habits of a category.
 
-    This endpoint returns the preset habits of a category with the given name. If the category is not found, it aborts with a 404 status code.
-
     :param name: The name of the category to get the preset habits of.
     :return: The preset habits of the category.
     """
