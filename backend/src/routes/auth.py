@@ -30,6 +30,6 @@ def login():
         access_token = create_access_token(identity=user.id, additional_claims=additional_claims, 
                                            expires_delta=expires)
         user.check_daily_streak()  # Update user streak and login count
-        return jsonify(access_token=access_token), 200
-
+        return jsonify(access_token=access_token, user_id=user.id ), 200
+    
     return jsonify({"msg": "Bad email or password"}), 401

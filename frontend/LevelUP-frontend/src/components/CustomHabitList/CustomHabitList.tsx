@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import useHttpRequest from "../../hooks/useHttpRequest";
-import "./UserHabitContainer.css";
+import React, { useEffect, useState } from "react";
+import "./CustomHabitList.css";
 import {
   Accordion,
   AccordionItem,
@@ -12,19 +11,20 @@ import {
   Button,
   Select,
 } from "@chakra-ui/react";
+import useHttpRequest from "../../hooks/useHttpRequest";
+import { HabitList } from "../types";
+import { io } from "socket.io-client";
 
 interface Habit {
   id: string;
   description: string;
 }
 
-interface HabitList {
-  id: string;
-  name: string;
+interface UserHabitContainerProps {
+  habits: Habit[];
 }
 
-const UserHabitContainer = () => {
-  const [habits, setHabits] = useState<Habit[]>([]);
+const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [habitLists, setHabitLists] = useState<HabitList[]>([]);
   const [selectedHabitListId, setSelectedHabitListId] = useState<string | null>(
@@ -33,16 +33,6 @@ const UserHabitContainer = () => {
   const [addHabitError, setAddHabitError] = useState<string | null>(null);
   const [addHabitSuccess, setAddHabitSuccess] = useState<boolean>(false);
   const [isFetchingHabits, setIsFetchingHabits] = useState<boolean>(false);
-
-  const {
-    data: habitData,
-    loading: habitLoading,
-    error: habitError,
-    sendRequest: fetchHabits,
-  } = useHttpRequest<Habit[], unknown>({
-    url: "http://127.0.0.1:5000/custom_habits/user_habits",
-    method: "GET",
-  });
 
   const {
     data: habitListData,
@@ -61,21 +51,26 @@ const UserHabitContainer = () => {
   });
 
   useEffect(() => {
-    setIsFetchingHabits(true);
-    fetchHabits();
-    fetchHabitLists();
-  }, [fetchHabits, fetchHabitLists]);
+    const socket = io("http://127.0.0.1:5000");
+
+    socket.on("habit_list_created", (habitList: HabitList) => {
+      setHabitLists((prevHabitLists) => [...prevHabitLists, habitList]);
+    });
+
+    return () => {
+      socket.disconnect();
+    }
+  }, []);
 
   useEffect(() => {
-    if (habitData) {
-      setHabits(habitData);
-      setIsFetchingHabits(false);
-    }
-  }, [habitData]);
+    setIsFetchingHabits(true);
+    fetchHabitLists();
+  }, [fetchHabitLists]);
 
   useEffect(() => {
     if (habitListData) {
       setHabitLists(habitListData);
+      setIsFetchingHabits(false);
     }
   }, [habitListData]);
 
@@ -105,8 +100,6 @@ const UserHabitContainer = () => {
 
   return (
     <div>
-      {habitLoading && <div>Loading...</div>}
-      {habitError && <div>{habitError}</div>}
       <Accordion allowToggle>
         <AccordionItem>
           <h2>
@@ -119,7 +112,6 @@ const UserHabitContainer = () => {
           </h2>
           <AccordionPanel pb={4}>
             {isFetchingHabits && <div>Loading habits...</div>}
-            {habitError && <div>{habitError}</div>}
             <ul>
               {habits.map((habit) => (
                 <li key={habit.id} id="habits-description">

@@ -3,14 +3,14 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask import Flask
 from flask_cors import CORS
+from flask_socketio import SocketIO
 from dotenv import load_dotenv
-from flask_sqlalchemy import SQLAlchemy
-from src.models import db
+
 cors = CORS()
+
 jwt = JWTManager()
 bcrypt = Bcrypt()
-#Initializing SQLAlchemy
-#db=SQLAlchemy()
+socketio = SocketIO()
 
 # Import all models here to ensure they are registered with SQLAlchemy
 from src.models.user import User
@@ -31,24 +31,24 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     app.url_map.strict_slashes = False
     app.config.from_object(config_class)
 
-    #from src.models import db
+    from src.models import db
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    cors.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     register_extensions(app)
     register_routes(app)
     register_handlers(app)
 
-    # create_db_tables(app)
+    create_db_tables(app)
 
     return app
 
-# def create_db_tables(app: Flask) -> None:
-#    from src.models import db
-#    with app.app_context():
-#        db.create_all()
+def create_db_tables(app: Flask) -> None:
+    from src.models import db
+    with app.app_context():
+        db.create_all()
 
 def register_extensions(app: Flask) -> None:
     """Register the extensions for the Flask app"""
@@ -87,9 +87,3 @@ def register_handlers(app: Flask) -> None:
         )
     )
 
-def add_and_commit(instance):
-    """
-    Add an instance to the session and commit it.
-    """
-    db.session.add(instance)
-    db.session.commit()

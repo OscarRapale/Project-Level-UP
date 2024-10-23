@@ -2,14 +2,31 @@ from flask import Blueprint, jsonify
 from flask import abort, request
 from src.models.user import User
 from sqlalchemy.exc import SQLAlchemyError
+from src import socketio
 from src.persistence import repo
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from flask_bcrypt import Bcrypt
-from flask import jsonify
-from src import db
+import json
+from datetime import datetime
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
-bcrypt = Bcrypt()
+
+def default_serializer(obj):
+    """
+    Serialize datetime objects to ISO format.
+
+    This function is used as a default serializer for JSON encoding. It checks if the
+    given object is an instance of `datetime` and converts it to an ISO 8601 formatted
+    string. If the object is not a `datetime` instance, it raises a `TypeError`.
+
+    Args:
+        obj (object): The object to be serialized.
+
+    Returns:
+        str: The ISO 8601 formatted string if the object is a `datetime` instance.
+    """
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 @users_bp.route("/", methods=["GET"])
 def get_users():
@@ -38,34 +55,13 @@ def create_user():
 
     :return: The created user and a 201 status code.
     """
-
     data = request.get_json()
 
-    if "username" not in data or "password" not in data:
-        abort(400, "Missing username or password field")
-
-    email = data.get("email")
-    password = data["password"]
-    username = data["username"]
-    is_admin = data.get("is_admin",False)
-
-    # Hash the password
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-    # Update the data with hashed password before creating the user
-    data["password_hash"] = hashed_password
+    if "password" not in data:
+        abort(400, "Missing password field")
 
     try:
-        # Create a new User object, passing plain text password
-        new_user = User(
-            email=email,  # Assuming email is also part of the data
-            username=username,
-            password=password
-            # Include any additional fields needed for user creation
-            )
-        # Add and commit new user to the database
-        db.session.add(new_user)
-        db.session.commit()
+        user = User.create(data)
 
     except KeyError as e:
         abort(400, f"Missing field: {e}")
@@ -76,7 +72,10 @@ def create_user():
     except SQLAlchemyError as e:
         abort(500, f"Database error: {e}")
 
-    return jsonify (new_user.to_dict()), 201
+    if user is None:
+        abort(400, "User already exists")
+
+    return user.to_dict(), 201
 
 @users_bp.route("/<user_id>", methods=["GET"])
 @jwt_required()
@@ -99,7 +98,15 @@ def get_user_by_id(user_id: str):
     if not user:
         abort(400, f"User with ID {user_id} not found")
 
-    return user.to_dict(), 200
+    user_data = user.to_dict()
+
+    # Convert datetime objects to strings
+    user_data_serialized = json.loads(json.dumps(user_data, default=default_serializer))
+
+    # Emit the user data to WebSocket clients
+    socketio.emit("user_update", {"user_id": user_id, "user_data": user_data_serialized})
+
+    return user_data_serialized, 200
 
 @users_bp.route("/<user_id>", methods=["PUT"])
 @jwt_required()
@@ -132,13 +139,21 @@ def update_user(user_id: str):
     if user is None:
         abort(404, f"User with ID {user_id} not found")
 
-    return user.to_dict(), 200
+    user_data = user.to_dict()
+
+    # Convert datetime objects to strings
+    user_data_serialized = json.loads(json.dumps(user_data, default=default_serializer))
+
+    # Emit the user data to WebSocket clients
+    socketio.emit("user_update", {"user_id": user_id, "user_data": user_data_serialized})
+
+    return user_data_serialized, 200
 
 @users_bp.route("/<user_id>", methods=["DELETE"])
 @jwt_required()
 def delete_user(user_id: str):
     """Deletes a user by ID"""
-
+    
     current_user_id = get_jwt_identity()
     current_user = User.get(current_user_id)
 
@@ -146,16 +161,10 @@ def delete_user(user_id: str):
     if not current_user.is_admin:
         abort(403, "You are not authorized to delete users.")
 
-    user = User.query.get(user_id)
-    if not user:
-        abort(404, f"User with ID {user_id} not found")
-
     try:
-        db.session.delete(user)
-        db.session.commit()
-        return jsonify({"msg":f"User with ID{user_id}deleted successfully"}), 200
+        if not User.delete(user_id):
+            abort(404, f"User with ID {user_id} not found")
     except SQLAlchemyError as e:
-        db.session.rollback()
         abort(500, f"Database error: {e}")
 
     return "", 204

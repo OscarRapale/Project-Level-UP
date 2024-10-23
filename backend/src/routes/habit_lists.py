@@ -3,8 +3,38 @@ from src.models import db
 from src.models.habit_list import HabitList
 from src.models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from src import socketio
+import json
+from datetime import datetime
 
 habit_lists_bp = Blueprint("habit_lists", __name__, url_prefix="/habit_lists")
+
+def default_serializer(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+def get_habit_details(habit_list):
+    from src.models.preset_habit import PresetHabit
+    from src.models.custom_habit import CustomHabit
+
+    habits = []
+    for item in habit_list.habits:
+        if item.preset_habit_id:
+            habit = PresetHabit.get(item.preset_habit_id)
+            habits.append({
+                "id": item.id,
+                "description": habit.description,
+                "type": "preset"
+            })
+        elif item.custom_habit_id:
+            habit = CustomHabit.get(item.custom_habit_id)
+            habits.append({
+                "id": item.id,
+                "description": habit.description,
+                "type": "custom"
+            })
+    return habits
 
 @habit_lists_bp.route("/", methods=["GET"])
 @jwt_required()
@@ -51,7 +81,12 @@ def create_habit_list():
     except ValueError as e:
         abort(404, str(e))
 
-    return habit_list.to_dict(), 201
+    habit_list_data = habit_list.to_dict()
+    habit_list_data_serialized = json.loads(json.dumps(habit_list_data, default=default_serializer))
+
+    socketio.emit("habit_list_created", habit_list_data_serialized)
+
+    return habit_list_data, 201
 
 @habit_lists_bp.route("/<habit_list_id>", methods=["GET"])
 @jwt_required()
@@ -148,8 +183,8 @@ def delete_habit_list(habit_list_id: str):
         abort(403, "You are not authorized to delete this habit list.")
 
     # Delete all HabitListItem instances that reference the HabitList
-    for item in habit_list.items:
-        db.session.delete(item)
+    for habit in habit_list.habits:
+        db.session.delete(habit)
 
     if not HabitList.delete(habit_list_id):
         abort(404, f"Habit list with ID {habit_list_id} not found")
@@ -197,6 +232,14 @@ def add_habit_to_habit_list(habit_list_id: str):
         new_habit_list_item = HabitListItem.create({"habit_list_id": habit_list_id, "preset_habit_id": preset_habit_id})
         added_preset_habits.append(new_habit_list_item.to_dict())
 
+    # Serialize habit list data
+    habit_list_data = habit_list.to_dict()
+    habit_list_data['habits'] = get_habit_details(habit_list)  # Ensure habits are included
+    habit_list_data_serialized = json.loads(json.dumps(habit_list_data, default=default_serializer))
+
+    # Emit the habit list data to WebSocket clients
+    socketio.emit("habit_list_update", {"habit_list_id": habit_list_id, "habit_list_data": habit_list_data_serialized})
+
     return {"added_preset_habits": added_preset_habits}, 200
 
 @habit_lists_bp.route("/<habit_list_id>/custom_habits", methods=["POST"])
@@ -239,6 +282,14 @@ def add_custom_habit_to_habit_list(habit_list_id: str):
 
         new_habit_list_item = HabitListItem.create({"habit_list_id": habit_list_id, "custom_habit_id": custom_habit_id})
         added_custom_habits.append(new_habit_list_item.to_dict())
+
+    # Serialize habit list data
+    habit_list_data = habit_list.to_dict()
+    habit_list_data['habits'] = get_habit_details(habit_list)  # Ensure habits are included
+    habit_list_data_serialized = json.loads(json.dumps(habit_list_data, default=default_serializer))
+
+    # Emit the habit list data to WebSocket clients
+    socketio.emit("habit_list_update", {"habit_list_id": habit_list_id, "habit_list_data": habit_list_data_serialized})
 
     return {"added_custom_habits": added_custom_habits}, 200
 
@@ -316,6 +367,18 @@ def complete_preset_habit(habit_list_id: str, habit_id: str):
             return jsonify({"msg": f"Habit list with ID {habit_list_id} not found"}), 404
 
         habit_list.complete_preset_habit(habit_id)
+
+        # Get the current user
+        current_user_id = get_jwt_identity()
+        user = User.get(current_user_id)
+
+        # Serialize user data
+        user_data = user.to_dict()
+        user_data_serialized = json.loads(json.dumps(user_data, default=default_serializer))
+
+        # Emit the user data to WebSocket clients
+        socketio.emit("user_update", {"user_id": current_user_id, "user_data": user_data_serialized})
+
         return jsonify({"msg": f"Habit with ID {habit_id} completed successfully"}), 200
 
     except ValueError as e:
@@ -342,11 +405,22 @@ def complete_custom_habit(habit_list_id: str, habit_id: str):
             return jsonify({"msg": f"Habit list with ID {habit_list_id} not found"}), 404
 
         habit_list.complete_custom_habit(habit_id)
+
+        # Get the current user
+        current_user_id = get_jwt_identity()
+        user = User.get(current_user_id)
+
+        # Serialize user data
+        user_data = user.to_dict()
+        user_data_serialized = json.loads(json.dumps(user_data, default=default_serializer))
+
+        # Emit the user data to WebSocket clients
+        socketio.emit("user_update", {"user_id": current_user_id, "user_data": user_data_serialized})
+
         return jsonify({"msg": f"Custom habit with ID {habit_id} completed successfully"}), 200
 
     except ValueError as e:
         return jsonify({"msg": str(e)}), 400
 
     except Exception as e:
-
         return jsonify({"msg": f"An error occurred while completing the custom habit"}), 500

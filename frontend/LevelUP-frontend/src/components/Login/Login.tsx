@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import useHttpRequest from "../../hooks/useHttpRequest";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
 import "./Login.css";
 
 // Zod schema for login form
@@ -19,7 +20,7 @@ const Login = () => {
   });
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const { data, loading, error, sendRequest } = useHttpRequest<
-    { access_token: string },
+    { access_token: string, user_id: string },
     LoginData
   >({
     url: "http://127.0.0.1:5000/login",
@@ -28,6 +29,7 @@ const Login = () => {
   });
 
   const navigate = useNavigate();
+  const { setUserId } = useUser();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -56,9 +58,10 @@ const Login = () => {
   useEffect(() => {
     if (data) {
       localStorage.setItem("token", data.access_token);
+      setUserId(data.user_id); // Set the user ID in the context and localStorage
       navigate("/");
     }
-  }, [data, navigate]);
+  }, [data, navigate, setUserId]);
 
   return (
     <div className="login-wrapper">

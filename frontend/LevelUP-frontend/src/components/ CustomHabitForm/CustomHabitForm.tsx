@@ -1,7 +1,7 @@
 import useHttpRequest from "../../hooks/useHttpRequest";
 import { z } from "zod";
 import { useState } from "react";
-import "./CustomHabitForm.css"
+import "./CustomHabitForm.css";
 
 const habitSchema = z.object({
   description: z
@@ -10,16 +10,19 @@ const habitSchema = z.object({
     .max(200, "Habit description must be at most 200 characters"),
 });
 
-const CustomHabitForm = () => {
+interface CustomHabitFormProps {
+  onHabitCreated: (habit: { id: string; description: string }) => void;
+}
+
+const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => {
   const [habitDescription, setHabitDescription] = useState("");
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const { data, loading, error, sendRequest } = useHttpRequest<
-    { message: string },
+    { id: string; description: string },
     { description: string }
   >({
     url: "http://127.0.0.1:5000/custom_habits",
     method: "POST",
-    body: { description: habitDescription },
   });
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -35,8 +38,9 @@ const CustomHabitForm = () => {
 
     setValidationErrors([]);
 
-    await sendRequest();
-    if (data) {
+    const response = await sendRequest({ body: { description: habitDescription } });
+    if (response) {
+      onHabitCreated(response);
       setHabitDescription("");
     }
   };
@@ -57,6 +61,7 @@ const CustomHabitForm = () => {
         </div>
         <button
           type="submit"
+          id="create-habit-btn"
           className="btn btn-outline-danger complete-button"
           disabled={loading}
         >
