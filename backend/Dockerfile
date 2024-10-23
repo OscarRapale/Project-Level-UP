@@ -28,4 +28,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 5000
 
 # Command to run your Flask-SocketIO application
-CMD ["gunicorn", "-k", "eventlet", "-b", "0.0.0.0:5000", "src:socketio_app"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "src:socketio_app"]
