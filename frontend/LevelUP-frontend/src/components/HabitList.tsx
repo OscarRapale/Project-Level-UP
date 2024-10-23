@@ -115,6 +115,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
       type === "preset" ? "habits" : "custom_habits"
     }/${habitId}/complete`;
     try {
+      console.log("Completing habit:", { habitId, type, url });
       await completeHabitRequest({ url });
       setHabits(habits.filter((habit) => habit.id !== habitId));
     } catch (error) {
@@ -142,7 +143,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
         className="my-4"
         style={{ fontFamily: "'Orbitron', 'Exo 2', 'Lexend'" }}
       >
-        All Habits
+        Today's Habits
       </h2>
       <div className="mb-3">
         <label htmlFor="habitListSelect" className="form-label">

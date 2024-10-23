@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useHttpRequest from "../../hooks/useHttpRequest";
 import "./CategoryContainer.css";
+import { io } from "socket.io-client";
 import {
   Accordion,
   AccordionItem,
@@ -74,6 +75,18 @@ const CategoryContainer: React.FC = () => {
     method: "POST",
     body: { preset_habit_ids: selectedHabits },
   });
+
+  useEffect(() => {
+    const socket = io("http://127.0.0.1:5000");
+
+    socket.on("habit_list_created", (habitList: HabitList) => {
+      setHabitLists((prevHabitLists) => [...prevHabitLists, habitList]);
+    });
+
+    return () => {
+      socket.disconnect();
+    }
+  }, []);
 
   useEffect(() => {
     fetchCategories();

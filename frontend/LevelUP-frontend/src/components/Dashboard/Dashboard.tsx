@@ -1,14 +1,12 @@
 import { Grid, GridItem, Box } from "@chakra-ui/react";
 import React from "react";
 import CategoryContainer from "../ CategoryContainer/CategoryContainer";
-import UserHabitContainer from "../UserHabitContainer/UserHabitContainer";
-import CustomHabitForm from "../ CustomHabitForm/CustomHabitForm";
 import UserCard from "../UserCard/UserCard";
 import "./Dashboard.css";
 import HabitListContainer from "../HabitListContainer";
+import CustomHabitsContainer from "../CustomHabitsContainer";
 
 const Dashboard: React.FC = () => {
-
   return (
     <Grid
       templateAreas={`
@@ -16,7 +14,6 @@ const Dashboard: React.FC = () => {
         "habitList userCard"
         "habitList category"
         "habitList customHabitForm"
-        "habitList userHabits"
       `}
       gridTemplateColumns={"2fr 1fr"}
       gap={4}
@@ -81,24 +78,7 @@ const Dashboard: React.FC = () => {
           color="white"
           marginBottom="50px"
         >
-          <CustomHabitForm />
-        </Box>
-      </GridItem>
-      <GridItem area={"userHabits"}>
-        <Box
-          bg="#333"
-          p={4}
-          borderRadius="2xl"
-          boxShadow="2xl"
-          _hover={{ boxShadow: "2xl" }}
-          w="75%"
-          h="auto"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          color="white"
-        >
-          <UserHabitContainer />
+          <CustomHabitsContainer />
         </Box>
       </GridItem>
     </Grid>
