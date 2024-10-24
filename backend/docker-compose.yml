@@ -1,10 +1,9 @@
 services:
   backend:
-    build:
-      context: ./backend
+    build: .
     working_dir: /app/src
     volumes:
-      - ./backend/data:/app/data
+      - ./data:/app/data
     ports:
       - "5000:5000"
     environment:
@@ -13,13 +12,3 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - REPOSITORY=${REPOSITORY}
     command: gunicorn -b 0.0.0.0:5000 app:app
-
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-    environment:
-      - NODE_ENV=development

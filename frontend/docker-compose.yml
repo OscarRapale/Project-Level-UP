@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      context: . 
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ./LevelUP-frontend:/app
+    ports:
+      - "3000:3000"

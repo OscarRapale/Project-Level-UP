@@ -169,7 +169,7 @@ def delete_user(user_id: str):
         abort(404, f"User with ID {user_id} not found")
 
     try:
-        db.session.delete(user)
+        db.session.delete(User)
         db.session.commit()
         return jsonify({"msg":f"User with ID{user_id}deleted successfully"}), 200
     except SQLAlchemyError as e:

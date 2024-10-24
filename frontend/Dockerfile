@@ -5,13 +5,13 @@ FROM node:14
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY LevelUP-frontend/package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application files to the working directory
-COPY . .
+COPY LevelUP-frontend/ ./
 
 # Build the React application
 RUN npm run build
@@ -23,4 +23,4 @@ RUN npm install -g serve
 EXPOSE 3000
 
 # Serve the React application
-CMD ["serve", "-s", "build"]
+CMD ["serve", "-s", "dist"]
