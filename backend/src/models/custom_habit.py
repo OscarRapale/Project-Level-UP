@@ -86,15 +86,19 @@ class CustomHabit(db.Model):
     def delete(custom_habit_id: str) -> bool:
         """
         Delete a CustomHabit instance from the database.
+
         Args:
             custom_habit_id (str): The ID of the custom habit to be deleted.
+
         Returns:
             bool: True if the custom habit was deleted, False if not found.
         """
         from src.persistence import repo
+
         custom_habit: CustomHabit | None = CustomHabit.get(custom_habit_id)
         if not custom_habit:
             return False
 
         repo.delete(custom_habit)
+
         return True

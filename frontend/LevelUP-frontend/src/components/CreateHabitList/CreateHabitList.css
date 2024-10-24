@@ -1,5 +1,14 @@
 #list-name-input {
     margin-bottom: 20px;
-    border-color: #DC143C;
+    color: black; /* Set text color to black */
+    background-color: white; /* Set background color to white */
+    border: 1px solid #ccc; /* Optional: Add a border */
+    padding: 8px; /* Optional: Add some padding */
+    border-radius: 4px; /* Optional: Add rounded corners */
 }
 
+#list-name-input:focus {
+    outline: none; /* Remove default focus outline */
+    border-color: #DC143C;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add a shadow on focus */
+  }
