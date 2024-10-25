@@ -7,8 +7,15 @@ services:
     ports:
       - "5000:5000"
     environment:
+      - FLASK_ENV=development
       - DATABASE_URL=sqlite:////app/data/level_up.db
       - ENV=${ENV}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - REPOSITORY=${REPOSITORY}
     command: gunicorn -b 0.0.0.0:5000 app:app
+    networks:
+      - project-level-up_default
+
+networks:
+  project-level-up_default:
+    external: true

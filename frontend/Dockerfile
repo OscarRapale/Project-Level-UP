@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM node:14
+FROM node:18
 
 # Set the working directory in the container
 WORKDIR /app
@@ -13,14 +13,8 @@ RUN npm install
 # Copy the rest of the application files to the working directory
 COPY LevelUP-frontend/ ./
 
-# Build the React application
-RUN npm run build
-
-# Install a simple HTTP server to serve the static files
-RUN npm install -g serve
-
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 5173
 
-# Serve the React application
-CMD ["serve", "-s", "dist"]
+# Run Vite development server
+CMD ["npm", "run", "dev", "--", "--host"]
