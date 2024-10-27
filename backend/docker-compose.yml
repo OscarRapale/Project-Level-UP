@@ -1,18 +1,19 @@
 services:
   backend:
     build: .
-    working_dir: /app/src
+    working_dir: /app
     volumes:
-      - ./data:/app/data
+      - .:/app
     ports:
       - "5000:5000"
     environment:
       - FLASK_ENV=development
+      - FLASK_APP=app.py
       - DATABASE_URL=sqlite:////app/data/level_up.db
       - ENV=${ENV}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - REPOSITORY=${REPOSITORY}
-    command: gunicorn -b 0.0.0.0:5000 app:app
+    command: flask run --host=0.0.0.0 --port=5000  # Change to Gunicorn for production
     networks:
       - project-level-up_default
 

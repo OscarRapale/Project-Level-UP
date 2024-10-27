@@ -1,7 +1,7 @@
 """Initialize Flask app."""
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
-from flask import Flask
+from flask import Config, Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ cors = CORS()
 
 jwt = JWTManager()
 bcrypt = Bcrypt()
-socketio = SocketIO()
+socketio = SocketIO(cors_allowed_origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
 # Import all models here to ensure they are registered with SQLAlchemy
 from src.models.user import User
@@ -20,7 +20,7 @@ from src.models.preset_habit import PresetHabit
 from src.models.custom_habit import CustomHabit
 from src.models.habit_list import HabitList
 
-def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
+def create_app(config_class=Config) -> Flask:
     """
     Create a Flask app with the given configuration class.
     The default configuration class is DevelopmentConfig.
@@ -29,14 +29,13 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     load_dotenv()
 
     app = Flask(__name__)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
     app.url_map.strict_slashes = False
     app.config.from_object(config_class)
 
-    from src.models import db
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    cors.init_app(app)
     socketio.init_app(app)
 
     register_extensions(app)
@@ -53,8 +52,9 @@ def create_db_tables(app: Flask) -> None:
         db.create_all()
 
 def register_extensions(app: Flask) -> None:
-    """Register the extensions for the Flask app"""
-    cors.init_app(app, resources={r"/*": {"origins": "*"}})
+#      """Register the extensions for the Flask app"""
+#      cors.init_app(app, resources={r"/*": {"origins": "*"}})
+    pass
 
 def register_routes(app: Flask) -> None:
     """Import and register the routes for the Flask app"""

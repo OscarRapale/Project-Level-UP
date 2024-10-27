@@ -5,7 +5,7 @@ FROM python:3.10
 RUN apt-get update && apt-get install -y sqlite3
 
 # Set the working directory in the container
-WORKDIR /app/src
+WORKDIR /app
 
 # Copy requirements.txt first for better caching
 COPY requirements.txt .
@@ -28,4 +28,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 5000
 
 # Command to run your Flask-SocketIO application
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "src:socketio_app"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "-k", "eventlet", "backend:app"]

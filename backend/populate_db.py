@@ -60,5 +60,5 @@ def populate_db(data_file):
             db.session.rollback()
 
 if __name__ == '__main__':
-    data_file = 'backend/data/categories_habits.json'
+    data_file = '/app/data/categories_habits.json'
     populate_db(data_file)
