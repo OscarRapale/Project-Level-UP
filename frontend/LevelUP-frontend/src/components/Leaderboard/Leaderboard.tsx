@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import useHttpRequest from "../hooks/useHttpRequest";
+import useHttpRequest from "../../hooks/useHttpRequest";
+import './Leaderboard.css';
 import {
   Box,
   Flex,
@@ -28,12 +29,16 @@ const Leaderboard: React.FC = () => {
   );
 
   useEffect(() => {
+    document.title = "Level-UP | Leaderboard";
+  }, []);
+
+  useEffect(() => {
     sendRequest();
   }, [sendRequest]);
 
   useEffect(() => {
     if (data) {
-      console.log("Received data:", data); // Add logging to verify data structure
+      console.log("Received data:", data);
       setUsers(data);
     }
   }, [data]);
@@ -52,9 +57,11 @@ const Leaderboard: React.FC = () => {
       w="80%"
       h="auto"
       m="auto"
-      mt={8}
+      mt="10rem"
       maxH="80vh"
       overflowY="auto"
+      marginBottom="150px"
+      className="leaderboard-container"
     >
       <Text
         fontSize="3xl"

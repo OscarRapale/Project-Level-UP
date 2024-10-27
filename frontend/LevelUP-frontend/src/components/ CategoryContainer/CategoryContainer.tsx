@@ -12,6 +12,7 @@ import {
   Checkbox,
   Button,
   Select,
+  useColorMode
 } from "@chakra-ui/react";
 
 interface Category {
@@ -75,6 +76,8 @@ const CategoryContainer: React.FC = () => {
     method: "POST",
     body: { preset_habit_ids: selectedHabits },
   });
+
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     const socket = io("http://127.0.0.1:5000");
@@ -160,7 +163,12 @@ const CategoryContainer: React.FC = () => {
               <AccordionButton
                 onClick={() => handleCategoryClick(category.name)}
               >
-                <Box flex="1" textAlign="left" id="category-name">
+                <Box
+                 flex="1"
+                  textAlign="left"
+                  id="category-name"
+                  className={`category-name ${colorMode === 'dark' ? 'dark-mode' : 'light-mode'}`}
+                  >
                   {category.name}
                 </Box>
                 <AccordionIcon />
@@ -171,7 +179,11 @@ const CategoryContainer: React.FC = () => {
               {presetHabitError && <div>{presetHabitError}</div>}
               <ul>
                 {presetHabits.map((habit) => (
-                  <li key={habit.id} id="habit-description">
+                  <li 
+                    key={habit.id}
+                    id="habit-description"
+                    className={`habit-description ${colorMode === 'dark' ? 'dark-mode' : 'light-mode'}`}
+                    >
                     <Checkbox
                       isChecked={selectedHabits.includes(habit.id)}
                       onChange={() => handleCheckboxChange(habit.id)}
@@ -212,12 +224,12 @@ const CategoryContainer: React.FC = () => {
           onClick={handleAddHabitsToList}
           disabled={selectedHabits.length === 0}
           variant="outline"
-          borderColor="red.800"
-          borderRadius="50px"
-          color="red.800"
+          borderRadius="3xl"
+          borderColor={colorMode === 'dark' ? '#22d3ee' : 'red.800'} // Change border color based on color mode
+          color={colorMode === 'dark' ? '#22d3ee' : 'red.800'} // Change text color based on color mode
           _hover={{
-            bg: "red.800",
-            color: "white"
+            bg: colorMode === 'dark' ? '#22d3ee' : '#red800',
+            color: 'white',
           }}
         >
           Add Selected Habits to List

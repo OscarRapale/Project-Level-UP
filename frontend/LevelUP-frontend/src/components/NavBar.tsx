@@ -6,10 +6,14 @@ import {
   IconButton,
   HStack,
   Stack,
+  useColorMode,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
 import { NavLink as RouterNavLink } from "react-router-dom";
+import { useUser } from "../hooks/useUser";
+import Logout from "./Logout";
+import ColorModeSwitch from "./ColorModeSwitch";
 
 const Links = [
   { name: "Home", path: "/" },
@@ -22,9 +26,11 @@ const Links = [
 const NavLink = ({
   children,
   to,
+  colorMode,
 }: {
   children: React.ReactNode;
   to: string;
+  colorMode: string;
 }) => (
   <RouterNavLink
     to={to}
@@ -33,21 +39,30 @@ const NavLink = ({
       borderRadius: "md",
       textDecoration: "none",
       backgroundColor: isActive ? "gray.200" : "transparent",
+      color: "inherit",
     })}
   >
-    {children}
+    <Box
+      _hover={{
+        color: colorMode === "dark" ? "#22d3ee" : "#DC143C", // Conditional color based on color mode
+      }}
+    >
+      {children}
+    </Box>
   </RouterNavLink>
 );
 
 const NavBar: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { userId } = useUser(); // Access userId from context
+  const { colorMode } = useColorMode();
 
   return (
     <Box
       bg="blackAlpha.800"
       color="white"
       px={4}
-      fontFamily="'Orbitron', 'Exo2', 'Lexend"
+      fontFamily="'Orbitron', 'Exo 2', 'Lexend"
       fontSize="lg"
     >
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
@@ -72,7 +87,7 @@ const NavBar: React.FC = () => {
         >
           <HStack as={"nav"} spacing={4}>
             {Links.map((link) => (
-              <NavLink key={link.name} to={link.path}>
+              <NavLink key={link.name} to={link.path} colorMode={colorMode}>
                 {link.name}
               </NavLink>
             ))}
@@ -86,9 +101,22 @@ const NavBar: React.FC = () => {
         >
           <Box>Logo</Box>
         </Box>
-        {/* Login link */}
+        {/* Conditional Login/Logout link */}
         <Flex alignItems={"center"} fontSize="md">
-          <Link href="/login">Login</Link>
+          <Flex alignItems={"center"} fontSize="md" mr={12} mt={5}>
+            <ColorModeSwitch />
+          </Flex>
+          {userId ? (
+            <Logout /> // Renders the Logout button if user is logged in
+          ) : (
+            <Link
+              as={RouterNavLink}
+              to="/login"
+              _hover={{ color: colorMode === "dark" ? "#22d3ee" : "#DC143C" }}
+            >
+              Login
+            </Link> // Otherwise, renders Login link
+          )}
         </Flex>
       </Flex>
 
@@ -96,7 +124,7 @@ const NavBar: React.FC = () => {
         <Box pb={4} display={{ md: "none" }}>
           <Stack as={"nav"} spacing={4}>
             {Links.map((link) => (
-              <NavLink key={link.name} to={link.path}>
+              <NavLink key={link.name} to={link.path} colorMode={colorMode}>
                 {link.name}
               </NavLink>
             ))}

@@ -4,14 +4,36 @@
     font-family: 'Orbitron', 'Exo 2', 'Lexend';
 }
 
-#category-name:hover {
-    color: #DC143C;
+.category-name:hover {
     text-decoration: underline;
 }
 
-#habit-description:hover {
+.category-name.dark-mode:hover {
+    color: #22d3ee;
+}
+
+.category-name.light-mode:hover {
     color: #DC143C;
-    text-decoration: underline;
+}
+
+.habit-description:hover {
+    text-decoration: underline;  
+}
+  
+.habit-description.dark-mode:hover {  
+    color: #22d3ee;  
+}
+
+.habit-description.light-mode:hover {
+    color: #DC143C;
+}
+
+button.dark-mode:hover {
+    border-color: #22d3ee;
+}
+  
+  button.light-mode:hover {
+    border-color: #DC143C;
 }
 
 #category-accordion {

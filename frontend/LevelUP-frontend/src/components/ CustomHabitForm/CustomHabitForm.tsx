@@ -1,6 +1,7 @@
 import useHttpRequest from "../../hooks/useHttpRequest";
 import { z } from "zod";
 import { useState } from "react";
+import { useColorMode, Button, Box, Text, Alert, AlertIcon, Input } from "@chakra-ui/react";
 import "./CustomHabitForm.css";
 
 const habitSchema = z.object({
@@ -25,6 +26,8 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
     method: "POST",
   });
 
+  const { colorMode } = useColorMode(); // Get the current color mode
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -46,11 +49,11 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
   };
 
   return (
-    <div className="container mt-2">
-      <h2 id="new-habit-header">Create a New Habit</h2>
+    <Box className="container mt-2">
+      <Text as="h2" id="new-habit-header">Create a New Habit</Text>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <input
+        <Box className="form-group">
+          <Input
             type="text"
             id="habitDescription"
             className="form-control"
@@ -58,32 +61,38 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
             onChange={(e) => setHabitDescription(e.target.value)}
             required
           />
-        </div>
-        <button
+        </Box>
+        <Button
           type="submit"
           id="create-habit-btn"
-          className="btn btn-outline-danger complete-button"
-          disabled={loading}
+          className="complete-button"
+          isLoading={loading}
+          borderRadius="3xl"
+          w="300px"
+          variant="outline"
+          borderColor={colorMode === 'dark' ? '#22d3ee' : '#DC143C'} // Change border color based on color mode
+          color={colorMode === 'dark' ? '#22d3ee' : '#DC143C'} // Change text color based on color mode
+          _hover={{
+            bg: colorMode === 'dark' ? '#22d3ee' : '#DC143C',
+            color: 'white',
+          }}
         >
           {loading ? "Creating..." : "Create Habit"}
-        </button>
+        </Button>
       </form>
       {validationErrors.length > 0 && (
-        <div className="alert alert-danger mt-3">
+        <Alert status="error" mt={3}>
+          <AlertIcon />
           <ul className="mb-0">
             {validationErrors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
           </ul>
-        </div>
+        </Alert>
       )}
-      {error && <div className="alert alert-danger mt-3">{error}</div>}
-      {data && (
-        <div className="alert alert-success mt-3">
-          Habit created successfully!
-        </div>
-      )}
-    </div>
+      {error && <Alert status="error" mt={3}><AlertIcon />{error}</Alert>}
+      {data && <Alert status="success" mt={3}>Habit created successfully!</Alert>}
+    </Box>
   );
 };
 

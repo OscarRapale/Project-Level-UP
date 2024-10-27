@@ -1,5 +1,6 @@
-import { useUser } from "../hooks/useUser";
-import useHttpRequest from "../hooks/useHttpRequest";
+import { useUser } from "../../hooks/useUser";
+import useHttpRequest from "../../hooks/useHttpRequest";
+import './UserProfile.css';
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -88,6 +89,10 @@ const UserProfile: React.FC = () => {
   });
 
   useEffect(() => {
+    document.title = "Level-UP | Profile";
+  }, []);
+
+  useEffect(() => {
     if (userId) {
       fetchUser();
     }
@@ -153,6 +158,8 @@ const UserProfile: React.FC = () => {
       p={4}
       alignItems="start"
       justifyContent="center"
+      marginBottom="50px"
+      className="user-profile-container"
     >
       <GridItem area={"userBasics"}>
         <Box

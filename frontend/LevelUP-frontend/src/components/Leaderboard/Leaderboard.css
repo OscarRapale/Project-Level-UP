@@ -1,0 +1,7 @@
+.leaderboard-container {
+    background-image: url('../../assets/circle2.svg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    position: relative;
+}

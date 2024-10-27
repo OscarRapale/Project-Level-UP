@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import useHttpRequest from "../../hooks/useHttpRequest";
 import "./CreateHabitList.css";
+import { Box, FormControl, useColorMode, FormLabel, Input, Button, Alert, AlertIcon } from "@chakra-ui/react";
 
 interface CreateHabitListProps {
   onHabitListCreated: (id: string, name: string) => void;
@@ -17,6 +18,8 @@ const CreateHabitList: React.FC<CreateHabitListProps> = ({
     body: { name: habitListName },
   });
 
+  const { colorMode } = useColorMode(); // Get the current color mode
+
   const handleCreateHabitList = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -30,26 +33,41 @@ const CreateHabitList: React.FC<CreateHabitListProps> = ({
   };
 
   return (
-    <div>
+    <Box>
       <form onSubmit={handleCreateHabitList}>
-        <input
-          id="list-name-input"
-          type="text"
-          value={habitListName}
-          onChange={(e) => setHabitListName(e.target.value)}
-          placeholder="Enter habit list name"
-          required
-        />
-        <button 
+        <FormControl id="list-name-input" isRequired>
+          <FormLabel textAlign="center">Enter habit list name</FormLabel>
+          <Input
+            type="text"
+            value={habitListName}
+            onChange={(e) => setHabitListName(e.target.value)}
+            placeholder="Enter habit list name"
+          />
+        </FormControl>
+        <Button
           id="create-btn"
           type="submit"
-          className="btn btn-outline-danger complete-button"
+          variant="outline"
+          borderRadius="3xl"
+          w="300px"
+          borderColor={colorMode === 'dark' ? '#22d3ee' : '#DC143C'} // Change border color based on color mode
+          color={colorMode === 'dark' ? '#22d3ee' : '#DC143C'} // Change text color based on color mode
+          _hover={{
+            bg: colorMode === 'dark' ? '#22d3ee' : '#DC143C',
+            color: 'white',
+          }}
+          mt={4}
         >
           Create Habit List
-        </button>
+        </Button>
       </form>
-      {error && <div className="alert alert-danger mt-3">{error}</div>}
-    </div>
+      {error && (
+        <Alert status="error" mt={3}>
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
+    </Box>
   );
 };
 

@@ -1,5 +1,5 @@
 import { Grid, GridItem, Box } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 import CategoryContainer from "../ CategoryContainer/CategoryContainer";
 import UserCard from "../UserCard/UserCard";
 import "./Dashboard.css";
@@ -7,6 +7,10 @@ import HabitListContainer from "../HabitListContainer";
 import CustomHabitsContainer from "../CustomHabitsContainer";
 
 const Dashboard: React.FC = () => {
+  useEffect(() => {
+    document.title = "Level-UP | Dashboard";
+  }, []);
+  
   return (
     <Grid
       templateAreas={`
@@ -20,6 +24,8 @@ const Dashboard: React.FC = () => {
       p={4}
       alignItems="start"
       justifyContent="center"
+      marginBottom="30px"
+      className="dashboard-container"
     >
       <GridItem area={"habitList"}>
         <Box

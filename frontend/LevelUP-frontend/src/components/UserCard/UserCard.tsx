@@ -10,6 +10,8 @@ import {
   Spinner,
   Text,
   Progress,
+  useColorMode,
+  Link,
 } from "@chakra-ui/react";
 import {
   HeartFill,
@@ -44,6 +46,8 @@ const UserCard: React.FC = () => {
     url: `http://127.0.0.1:5000/users/${userId}`,
     method: "GET",
   });
+
+  const { colorMode } = useColorMode()
 
   useEffect(() => {
     if (userId) {
@@ -104,16 +108,17 @@ const UserCard: React.FC = () => {
       )}
       {user && (
         <>
-          <Text
+          <Link
+            href="/profile"
             fontSize="2xl"
             fontWeight="bold"
-            fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
+            fontFamily="'Orbitron', 'Exo 2', 'Lexend'" 
             _hover={{
-              color: "#DC143C"
+              color: colorMode === 'dark' ? '#22d3ee' : '#DC143C',
             }}
           >
             {user.username}
-          </Text>
+          </Link>
           <Box display="flex" alignItems="center" justifyContent="center">
             <ChevronDoubleUp
               style={{
