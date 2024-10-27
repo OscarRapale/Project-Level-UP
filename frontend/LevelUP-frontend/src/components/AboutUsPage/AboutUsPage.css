@@ -1,0 +1,7 @@
+.about-us-container {
+    background-image: url('../../assets/circuit.svg');
+    background-size: 170% 150%;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
