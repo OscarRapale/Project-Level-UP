@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import useHttpRequest from "../../hooks/useHttpRequest";
 import { io } from "socket.io-client";
-import "./UserCard.css"
+import "./UserCard.css";
 import {
   Alert,
   AlertIcon,
@@ -12,6 +12,14 @@ import {
   Progress,
   useColorMode,
   Link,
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
 } from "@chakra-ui/react";
 import {
   HeartFill,
@@ -21,6 +29,7 @@ import {
   CheckCircleFill,
 } from "react-bootstrap-icons";
 
+// Interface for User
 interface User {
   id: string;
   username: string;
@@ -36,7 +45,10 @@ interface User {
 const UserCard: React.FC = () => {
   const { userId } = useUser();
   const [user, setUser] = useState<User | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [isLevelUpModalOpen, setLevelUpModalOpen] = useState(false);
 
+  // HTTP request hook for fetching user data
   const {
     data: userData,
     loading: userLoading,
@@ -47,20 +59,23 @@ const UserCard: React.FC = () => {
     method: "GET",
   });
 
-  const { colorMode } = useColorMode()
+  const { colorMode } = useColorMode();
 
+  // Fetch user data when userId changes
   useEffect(() => {
     if (userId) {
       fetchUser();
     }
   }, [fetchUser, userId]);
 
+  // Update user state when userData is fetched
   useEffect(() => {
     if (userData) {
       setUser(userData);
     }
   }, [userData]);
 
+  // WebSocket connection to listen for user updates
   useEffect(() => {
     const socket = io("http://127.0.0.1:5000");
 
@@ -70,6 +85,11 @@ const UserCard: React.FC = () => {
 
     socket.on("user_update", (data: { user_id: string; user_data: User }) => {
       if (data.user_id === userId) {
+        if (data.user_data.level > (user?.level || 0)) {
+          setLevelUpModalOpen(true);
+        } else if (data.user_data.hp > (user?.hp || 0)) {
+          setNotification("HP restored!");
+        }
         setUser(data.user_data);
       }
     });
@@ -81,7 +101,21 @@ const UserCard: React.FC = () => {
     return () => {
       socket.disconnect();
     };
-  }, [userId]);
+  }, [userId, user]);
+
+  // Clear notification after 3 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
+  // Handle closing the level-up modal
+  const handleCloseLevelUpModal = () => {
+    setLevelUpModalOpen(false);
+    setNotification(null);
+  };
 
   return (
     <Box
@@ -93,12 +127,18 @@ const UserCard: React.FC = () => {
       boxShadow="2xl"
       textAlign="center"
       color="white"
-      w="80%"
+      w={{ base: "100%", md: "80%" }}
       marginBottom="50px"
-      marginTop="10rem"
+      marginTop={{ base: "2rem", md: "10rem" }}
       _hover={{ boxShadow: "2xl", transform: "scale(1.05)" }}
       animation="float 3s ease-in-out infinite"
     >
+      {notification && (
+        <Alert status="success" mb={4}>
+          <AlertIcon />
+          {notification}
+        </Alert>
+      )}
       {userLoading && <Spinner />}
       {userError && (
         <Alert status="error">
@@ -110,11 +150,11 @@ const UserCard: React.FC = () => {
         <>
           <Link
             href="/profile"
-            fontSize="2xl"
+            fontSize={{ base: "xl", md: "2xl" }}
             fontWeight="bold"
-            fontFamily="'Orbitron', 'Exo 2', 'Lexend'" 
+            fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
             _hover={{
-              color: colorMode === 'dark' ? '#22d3ee' : '#DC143C',
+              color: colorMode === "dark" ? "#22d3ee" : "#DC143C",
             }}
           >
             {user.username}
@@ -128,7 +168,7 @@ const UserCard: React.FC = () => {
               }}
               size={"28px"}
             />
-            <Text fontSize="xl">Level {user.level}</Text>
+            <Text fontSize={{ base: "lg", md: "xl" }}>Level {user.level}</Text>
           </Box>
           <Box display="flex" alignItems="center" justifyContent="center">
             <Fire
@@ -139,14 +179,14 @@ const UserCard: React.FC = () => {
               }}
               size={"25px"}
             />
-            <Text fontSize="xl">Daily Streak {user.streak}</Text>
+            <Text fontSize={{ base: "lg", md: "xl" }}>Daily Streak {user.streak}</Text>
           </Box>
           <Box display="flex" alignItems="center" justifyContent="center">
             <HeartFill
               style={{ color: "red", marginRight: "7px", marginBottom: "13px" }}
               size={"25px"}
             />
-            <Text fontSize="xl">
+            <Text fontSize={{ base: "lg", md: "xl" }}>
               HP {user.hp}/{user.max_hp}
             </Text>
           </Box>
@@ -159,7 +199,7 @@ const UserCard: React.FC = () => {
               }}
               size={"25px"}
             />
-            <Text fontSize="xl">
+            <Text fontSize={{ base: "lg", md: "xl" }}>
               Total Habits Completed {user.habits_completed}
             </Text>
           </Box>
@@ -183,7 +223,7 @@ const UserCard: React.FC = () => {
                 }}
                 size={"25px"}
               />
-              <Text fontSize="xl">XP :</Text>
+              <Text fontSize={{ base: "lg", md: "xl" }}>XP :</Text>
             </Box>
             <Progress
               value={(user.current_xp / user.xp_to_next_level) * 100}
@@ -191,12 +231,35 @@ const UserCard: React.FC = () => {
               colorScheme="green"
               width="80%"
             />
-            <Text fontSize="lg">
+            <Text fontSize={{ base: "md", md: "lg" }}>
               {user.current_xp}/{user.xp_to_next_level}
             </Text>
           </Box>
         </>
       )}
+      {/* Level-Up Modal */}
+      <Modal isOpen={isLevelUpModalOpen} onClose={handleCloseLevelUpModal}>
+        <ModalOverlay />
+        <ModalContent backgroundColor="#1A202C" color="white" borderRadius="2xl">
+          <ModalHeader fontFamily="'Orbitron'" textAlign="center" fontSize="2xl" color="yellow.300">
+            🎉 Level Up! 🎉
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text fontSize="xl" textAlign="center" mb={4}>
+              Congratulations, {user?.username}! You’ve reached Level {user?.level}.
+            </Text>
+            <Text fontSize="xl" textAlign="center">
+              Keep up the great work!
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="cyan" onClick={handleCloseLevelUpModal}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
