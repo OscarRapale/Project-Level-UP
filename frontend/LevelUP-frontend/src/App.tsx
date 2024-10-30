@@ -11,20 +11,25 @@ import UserProfile from "./components/UserProfile/UserProfile";
 import AboutUsPage from "./components/AboutUsPage/AboutUsPage";
 import Footer from "./components/Footer";
 
+// Main App component
 const App: React.FC = () => {
   return (
+    // Provide UserContext to the entire app
     <UserProvider>
       <Router>
+        {/* Navigation bar */}
         <NavBar />
+        {/* Define routes for different pages */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/sign-up" element={<Signup />} />
           <Route path="/profile" element={<UserProfile />} />
-          <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
         </Routes>
+        {/* Footer */}
         <Footer />
       </Router>
     </UserProvider>
