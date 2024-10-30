@@ -2,11 +2,13 @@ import {
   Box,
   Link,
   Flex,
+  Image,
   useDisclosure,
   IconButton,
   HStack,
   Stack,
   useColorMode,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
@@ -14,6 +16,8 @@ import { NavLink as RouterNavLink } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 import Logout from "./Logout";
 import ColorModeSwitch from "./ColorModeSwitch";
+import lightLogoSvg from "../assets/light-logo.svg";
+import darkLogoSvg from "../assets/dark-logo.svg";
 
 const Links = [
   { name: "Home", path: "/" },
@@ -56,6 +60,9 @@ const NavBar: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { userId } = useUser(); // Access userId from context
   const { colorMode } = useColorMode();
+  const isDesktop = useBreakpointValue({ base: false, md: true });
+
+  const logo = colorMode === "dark" ? darkLogoSvg : lightLogoSvg;
 
   return (
     <Box
@@ -68,7 +75,13 @@ const NavBar: React.FC = () => {
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
         {/* Logo for desktop view */}
         <Box display={{ base: "none", md: "flex" }}>
-          <Box>Logo</Box>
+          <Image
+            src={logo}
+            alt="Logo"
+            boxSize="100px"
+            width="80px"
+            height="80px"
+          />
         </Box>
         {/* IconButton for mobile view */}
         <Box display={{ base: "flex", md: "none" }}>
@@ -98,16 +111,25 @@ const NavBar: React.FC = () => {
           display={{ base: "flex", md: "none" }}
           flex={1}
           justifyContent={"center"}
+          boxSize="150px"
         >
-          <Box>Logo</Box>
+          <Image
+            src={logo}
+            alt="Logo"
+            boxSize="200px"
+            width="80px"
+            height="150px"
+          />
         </Box>
         {/* Conditional Login/Logout link */}
         <Flex alignItems={"center"} fontSize="md">
-          <Flex alignItems={"center"} fontSize="md" mr={12} mt={5}>
-            <ColorModeSwitch />
-          </Flex>
+          {isDesktop && (
+            <Flex alignItems={"center"} fontSize="md" mr={4} mt="15px">
+              <ColorModeSwitch />
+            </Flex>
+          )}
           {userId ? (
-            <Logout /> // Renders the Logout button if user is logged in
+            <Logout /> // Renders the Logout link if user is logged in
           ) : (
             <Link
               as={RouterNavLink}
@@ -128,6 +150,9 @@ const NavBar: React.FC = () => {
                 {link.name}
               </NavLink>
             ))}
+            <Flex alignItems={"center"} justifyContent={"center"}>
+              <ColorModeSwitch />
+            </Flex>
           </Stack>
         </Box>
       ) : null}

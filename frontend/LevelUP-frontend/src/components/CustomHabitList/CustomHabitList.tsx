@@ -16,16 +16,19 @@ import useHttpRequest from "../../hooks/useHttpRequest";
 import { HabitList } from "../types";
 import { io } from "socket.io-client";
 
+// Interface for Habit
 interface Habit {
   id: string;
   description: string;
 }
 
+// Props interface for UserHabitContainer component
 interface UserHabitContainerProps {
   habits: Habit[];
 }
 
 const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
+  // State variables
   const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
   const [habitLists, setHabitLists] = useState<HabitList[]>([]);
   const [selectedHabitListId, setSelectedHabitListId] = useState<string | null>(
@@ -35,6 +38,7 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
   const [addHabitSuccess, setAddHabitSuccess] = useState<boolean>(false);
   const [isFetchingHabits, setIsFetchingHabits] = useState<boolean>(false);
 
+  // Fetch habit lists for the user
   const {
     data: habitListData,
     loading: habitListLoading,
@@ -45,14 +49,16 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
     method: "GET",
   });
 
+  // Add selected habits to the selected habit list
   const { sendRequest: addHabitsRequest } = useHttpRequest({
     url: `http://127.0.0.1:5000/habit_lists/${selectedHabitListId}/custom_habits`,
     method: "POST",
     body: { custom_habit_ids: selectedHabits },
   });
 
-  const { colorMode } = useColorMode();
+  const { colorMode } = useColorMode(); // Get the current color mode
 
+  // WebSocket connection to listen for habit list creation events
   useEffect(() => {
     const socket = io("http://127.0.0.1:5000");
 
@@ -65,11 +71,13 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
     }
   }, []);
 
+  // Fetch habit lists on component mount
   useEffect(() => {
     setIsFetchingHabits(true);
     fetchHabitLists();
   }, [fetchHabitLists]);
 
+  // Update habit lists state when habit list data is fetched
   useEffect(() => {
     if (habitListData) {
       setHabitLists(habitListData);
@@ -77,6 +85,7 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
     }
   }, [habitListData]);
 
+  // Handle checkbox change for selecting habits
   const handleCheckboxChange = (habitId: string) => {
     setSelectedHabits((prevSelected) =>
       prevSelected.includes(habitId)
@@ -85,6 +94,7 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
     );
   };
 
+  // Handle adding selected habits to the selected habit list
   const handleAddHabitsToList = async () => {
     if (!selectedHabitListId) {
       setAddHabitError("Please select a habit list first.");
@@ -111,6 +121,7 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
                flex="1"
                textAlign="left"
                id="habits-box"
+               fontSize="xl"
                className={`habits-box ${colorMode === 'dark' ? 'dark-mode' : 'light-mode'}`}
                >
                 My Habits
@@ -166,10 +177,10 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
           disabled={selectedHabits.length === 0}
           variant="outline"
           borderRadius="3xl"
-          borderColor={colorMode === 'dark' ? '#22d3ee' : 'red.800'} // Change border color based on color mode
-          color={colorMode === 'dark' ? '#22d3ee' : 'red.800'} // Change text color based on color mode
+          borderColor={colorMode === 'dark' ? '#22d3ee' : 'red.600'} // Change border color based on color mode
+          color={colorMode === 'dark' ? '#22d3ee' : 'red.600'} // Change text color based on color mode
           _hover={{
-            bg: colorMode === 'dark' ? '#22d3ee' : '#red800',
+            bg: colorMode === 'dark' ? '#22d3ee' : 'red.600',
             color: 'white',
           }}
         >

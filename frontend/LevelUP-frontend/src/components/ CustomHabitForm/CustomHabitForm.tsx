@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useColorMode, Button, Box, Text, Alert, AlertIcon, Input } from "@chakra-ui/react";
 import "./CustomHabitForm.css";
 
+// Zod schema for validating habit description
 const habitSchema = z.object({
   description: z
     .string()
@@ -11,13 +12,17 @@ const habitSchema = z.object({
     .max(200, "Habit description must be at most 200 characters"),
 });
 
+// Props interface for CustomHabitForm component
 interface CustomHabitFormProps {
   onHabitCreated: (habit: { id: string; description: string }) => void;
 }
 
 const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => {
+  // State variables
   const [habitDescription, setHabitDescription] = useState("");
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  
+  // HTTP request hook for creating a new custom habit
   const { data, loading, error, sendRequest } = useHttpRequest<
     { id: string; description: string },
     { description: string }
@@ -28,9 +33,11 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
 
   const { colorMode } = useColorMode(); // Get the current color mode
 
+  // Handle form submission
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
+    // Validate habit description using Zod schema
     const result = habitSchema.safeParse({ description: habitDescription });
 
     if (!result.success) {
@@ -41,18 +48,30 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
 
     setValidationErrors([]);
 
+    // Send request to create a new custom habit
     const response = await sendRequest({ body: { description: habitDescription } });
     if (response) {
-      onHabitCreated(response);
-      setHabitDescription("");
+      onHabitCreated(response); // Call the onHabitCreated callback with the new habit
+      setHabitDescription(""); // Clear the input field
     }
   };
 
   return (
-    <Box className="container mt-2">
-      <Text as="h2" id="new-habit-header">Create a New Habit</Text>
+    <Box
+      className="container mt-2"
+      p={4}
+      borderRadius="2xl"
+      boxShadow="2xl"
+     
+      w={{ base: "100%", md: "80%" }}
+      margin="0 auto"
+      mt={{ base: "2rem", md: "4rem" }}
+    >
+      <Text as="h2" id="new-habit-header" fontSize={{ base: "xl", md: "2xl" }} mb={4}>
+        Create a New Habit
+      </Text>
       <form onSubmit={handleSubmit}>
-        <Box className="form-group">
+        <Box className="form-group" mb={4}>
           <Input
             type="text"
             id="habitDescription"
@@ -60,6 +79,7 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
             value={habitDescription}
             onChange={(e) => setHabitDescription(e.target.value)}
             required
+            size={{ base: "md", md: "lg" }}
           />
         </Box>
         <Button
@@ -68,12 +88,12 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
           className="complete-button"
           isLoading={loading}
           borderRadius="3xl"
-          w="300px"
+          w={{ base: "100%", md: "300px" }}
           variant="outline"
-          borderColor={colorMode === 'dark' ? '#22d3ee' : '#DC143C'} // Change border color based on color mode
-          color={colorMode === 'dark' ? '#22d3ee' : '#DC143C'} // Change text color based on color mode
+          borderColor={colorMode === 'dark' ? '#22d3ee' : 'red.600'} // Change border color based on color mode
+          color={colorMode === 'dark' ? '#22d3ee' : 'red.600'} // Change text color based on color mode
           _hover={{
-            bg: colorMode === 'dark' ? '#22d3ee' : '#DC143C',
+            bg: colorMode === 'dark' ? '#22d3ee' : 'red.600',
             color: 'white',
           }}
         >

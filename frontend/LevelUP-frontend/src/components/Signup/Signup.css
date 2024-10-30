@@ -1,0 +1,27 @@
+.signup-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+}
+
+.right-circle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 9rem;
+    margin-right: 10rem;
+    width: 50rem;
+    height: 40rem;
+}
+
+.left-circle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin-bottom: 30rem;
+    margin-left: 10rem;
+    width: 50rem;
+    height: 40rem;
+    z-index: -1;
+}

@@ -32,7 +32,7 @@ button.dark-mode:hover {
     border-color: #22d3ee;
 }
   
-  button.light-mode:hover {
+button.light-mode:hover {
     border-color: #DC143C;
 }
 

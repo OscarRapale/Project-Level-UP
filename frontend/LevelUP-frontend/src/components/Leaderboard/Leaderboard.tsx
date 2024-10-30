@@ -12,6 +12,7 @@ import {
   Badge,
 } from "@chakra-ui/react";
 
+// Interface for User
 interface User {
   id: string;
   username: string;
@@ -20,7 +21,10 @@ interface User {
 }
 
 const Leaderboard: React.FC = () => {
+  // State variables
   const [users, setUsers] = useState<User[]>([]);
+  
+  // HTTP request hook for fetching leaderboard data
   const { data, loading, error, sendRequest } = useHttpRequest<User[], unknown>(
     {
       url: "http://127.0.0.1:5000/users/leaderboard",
@@ -28,14 +32,17 @@ const Leaderboard: React.FC = () => {
     }
   );
 
+  // Set the document title when the component mounts
   useEffect(() => {
     document.title = "Level-UP | Leaderboard";
   }, []);
 
+  // Fetch leaderboard data when the component mounts
   useEffect(() => {
     sendRequest();
   }, [sendRequest]);
 
+  // Update users state when leaderboard data is fetched
   useEffect(() => {
     if (data) {
       console.log("Received data:", data);
@@ -54,17 +61,17 @@ const Leaderboard: React.FC = () => {
       color="white"
       borderRadius="md"
       boxShadow="lg"
-      w="80%"
+      w={{ base: "100%", md: "80%" }}
       h="auto"
       m="auto"
-      mt="10rem"
+      mt={{ base: "2rem", md: "10rem" }}
       maxH="80vh"
       overflowY="auto"
       marginBottom="150px"
       className="leaderboard-container"
     >
       <Text
-        fontSize="3xl"
+        fontSize={{ base: "2xl", md: "3xl" }}
         fontWeight="bold"
         fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
         mb={4}
@@ -91,11 +98,12 @@ const Leaderboard: React.FC = () => {
           boxShadow="md"
           _hover={{ boxShadow: "xl", transform: "scale(1.02)" }}
           transition="all 0.2s"
+          flexDirection={{ base: "column", md: "row" }}
         >
-          <Flex alignItems="center">
+          <Flex alignItems="center" mb={{ base: 2, md: 0 }}>
             <Avatar name={user.username} size="md" mr={4} />
-            <Box>
-              <Text fontSize="xl" fontWeight="bold">
+            <Box textAlign={{ base: "center", md: "left" }}>
+              <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
                 {user.username}
               </Text>
               <Badge colorScheme="teal" fontSize="0.8em">
@@ -103,8 +111,8 @@ const Leaderboard: React.FC = () => {
               </Badge>
             </Box>
           </Flex>
-          <Text fontSize="xl">Level: {user.level}</Text>
-          <Text fontSize="xl">XP: {user.XP}</Text>
+          <Text fontSize={{ base: "lg", md: "xl" }}>Level: {user.level}</Text>
+          <Text fontSize={{ base: "lg", md: "xl" }}>XP: {user.XP}</Text>
         </Flex>
       ))}
     </Box>

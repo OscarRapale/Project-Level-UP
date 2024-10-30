@@ -27,6 +27,7 @@ import {
   LightningChargeFill,
 } from "react-bootstrap-icons";
 
+// Interface for User
 interface User {
   id: string;
   username: string;
@@ -60,6 +61,7 @@ const UserProfile: React.FC = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const toast = useToast();
 
+  // HTTP request hook for fetching user data
   const {
     data: userData,
     loading: userLoading,
@@ -70,6 +72,7 @@ const UserProfile: React.FC = () => {
     method: "GET",
   });
 
+  // HTTP request hook for updating user data
   const {
     sendRequest: updateUser,
     loading: updateLoading,
@@ -88,16 +91,19 @@ const UserProfile: React.FC = () => {
     method: "PUT",
   });
 
+  // Set the document title when the component mounts
   useEffect(() => {
     document.title = "Level-UP | Profile";
   }, []);
 
+  // Fetch user data when userId changes
   useEffect(() => {
     if (userId) {
       fetchUser();
     }
   }, [fetchUser, userId]);
 
+  // Update user state when userData is fetched
   useEffect(() => {
     if (userData) {
       setUser(userData);
@@ -105,11 +111,13 @@ const UserProfile: React.FC = () => {
     }
   }, [userData]);
 
+  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.newPassword !== formData.confirmPassword) {
@@ -140,20 +148,32 @@ const UserProfile: React.FC = () => {
     }
   };
 
+  // Toggle form visibility
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
 
   return (
     <Grid
-      templateAreas={`
-        "userBasics userBasics"
-        "hpCard hpCard"
-        "strCard vitCard"
-        "dxtCard intCard"
-        "luckCard luckCard"
-      `}
-      gridTemplateColumns={"1fr 1fr"}
+      templateAreas={{
+        base: `
+          "userBasics"
+          "hpCard"
+          "strCard"
+          "vitCard"
+          "dxtCard"
+          "intCard"
+          "luckCard"
+        `,
+        md: `
+          "userBasics userBasics"
+          "hpCard hpCard"
+          "strCard vitCard"
+          "dxtCard intCard"
+          "luckCard luckCard"
+        `,
+      }}
+      gridTemplateColumns={{ base: "1fr", md: "1fr 1fr" }}
       gap={4}
       p={4}
       alignItems="start"
@@ -161,14 +181,15 @@ const UserProfile: React.FC = () => {
       marginBottom="50px"
       className="user-profile-container"
     >
+      {/* User Basics Card */}
       <GridItem area={"userBasics"}>
         <Box
           bg="#333"
-          p={20}
+          p={8}
           borderRadius="2xl"
           boxShadow="2xl"
           _hover={{ boxShadow: "2xl" }}
-          w="50%"
+          w={{ base: "100%", md: "50%" }}
           h="auto"
           display="flex"
           flexDirection="column"
@@ -176,7 +197,7 @@ const UserProfile: React.FC = () => {
           justifyContent="center"
           color="white"
           margin="0 auto"
-          marginTop="10rem"
+          marginTop={{ base: "2rem", md: "10rem" }}
           animation="float 3s ease-in-out infinite"
           fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
         >
@@ -341,17 +362,18 @@ const UserProfile: React.FC = () => {
 
       {user && (
         <>
+          {/* HP Card */}
           <GridItem area={"hpCard"}>
             <Box
               bg="#333"
-              p={20}
+              p={8}
               borderRadius="2xl"
               boxShadow="2xl"
               _hover={{
                 boxShadow: "2xl",
                 color: "#DC143C",
               }}
-              w="20%"
+              w={{ base: "100%", md: "20%" }}
               h="auto"
               color="white"
               margin="0 auto"
@@ -368,17 +390,18 @@ const UserProfile: React.FC = () => {
             </Box>
           </GridItem>
 
+          {/* Strength Card */}
           <GridItem area={"strCard"}>
             <Box
               bg="#333"
-              p={20}
+              p={8}
               borderRadius="2xl"
               boxShadow="2xl"
               _hover={{
                 boxShadow: "2xl",
                 color: "#7DF9FF",
               }}
-              w="40%"
+              w={{ base: "100%", md: "40%" }}
               h="auto"
               color="white"
               margin="0 auto"
@@ -394,21 +417,22 @@ const UserProfile: React.FC = () => {
             </Box>
           </GridItem>
 
+          {/* Vitality Card */}
           <GridItem area={"vitCard"}>
             <Box
               bg="#333"
-              p={20}
+              p={8}
               borderRadius="2xl"
               boxShadow="2xl"
               _hover={{
                 boxShadow: "2xl",
                 color: "#7FFFD4",
               }}
-              w="40%"
+              w={{ base: "100%", md: "40%" }}
               h="auto"
               color="white"
               margin="0 auto"
-              ml="43px"
+              ml={{ base: "3px", md: "43px"  }}
               fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
               textAlign="center"
               animation="float 3s ease-in-out infinite"
@@ -420,17 +444,18 @@ const UserProfile: React.FC = () => {
             </Box>
           </GridItem>
 
+          {/* Dexterity Card */}
           <GridItem area={"dxtCard"}>
             <Box
               bg="#333"
-              p={20}
+              p={8}
               borderRadius="2xl"
               boxShadow="2xl"
               _hover={{
                 boxShadow: "2xl",
                 color: "#FF5F1F",
               }}
-              w="40%"
+              w={{ base: "100%", md: "40%" }}
               h="auto"
               color="white"
               margin="0 auto"
@@ -446,21 +471,22 @@ const UserProfile: React.FC = () => {
             </Box>
           </GridItem>
 
+          {/* Intelligence Card */}
           <GridItem area={"intCard"}>
             <Box
               bg="#333"
-              p={20}
+              p={8}
               borderRadius="2xl"
               boxShadow="2xl"
               _hover={{
                 boxShadow: "2xl",
                 color: "gold",
               }}
-              w="40%"
+              w={{ base: "100%", md: "40%" }}
               h="auto"
               color="white"
               margin="0 auto"
-              ml="43px"
+              ml={{ base: "3px", md: "43px" }}
               fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
               textAlign="center"
               animation="float 3s ease-in-out infinite"
@@ -472,17 +498,18 @@ const UserProfile: React.FC = () => {
             </Box>
           </GridItem>
 
+          {/* Luck Card */}
           <GridItem area={"luckCard"}>
             <Box
               bg="#333"
-              p={20}
+              p={8}
               borderRadius="2xl"
               boxShadow="2xl"
               _hover={{
                 boxShadow: "2xl",
                 color: "#FF69B4",
               }}
-              w="20%"
+              w={{ base: "100%", md: "20%" }}
               h="auto"
               color="white"
               margin="0 auto"
