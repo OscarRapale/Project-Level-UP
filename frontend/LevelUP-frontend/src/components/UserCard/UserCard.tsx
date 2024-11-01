@@ -47,6 +47,7 @@ const UserCard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
   const [isLevelUpModalOpen, setLevelUpModalOpen] = useState(false);
+  const [isHpLossModalOpen, setHpLossModalOpen] = useState(false);
 
   // HTTP request hook for fetching user data
   const {
@@ -87,6 +88,8 @@ const UserCard: React.FC = () => {
       if (data.user_id === userId) {
         if (data.user_data.level > (user?.level || 0)) {
           setLevelUpModalOpen(true);
+        } else if (data.user_data.hp < (user?.hp || 0)) {
+          setHpLossModalOpen(true);
         } else if (data.user_data.hp > (user?.hp || 0)) {
           setNotification("HP restored!");
         }
@@ -103,10 +106,10 @@ const UserCard: React.FC = () => {
     };
   }, [userId, user]);
 
-  // Clear notification after 3 seconds
+  // Clear notification after 7 seconds
   useEffect(() => {
     if (notification) {
-      const timer = setTimeout(() => setNotification(null), 3000);
+      const timer = setTimeout(() => setNotification(null), 7000);
       return () => clearTimeout(timer);
     }
   }, [notification]);
@@ -114,6 +117,12 @@ const UserCard: React.FC = () => {
   // Handle closing the level-up modal
   const handleCloseLevelUpModal = () => {
     setLevelUpModalOpen(false);
+    setNotification(null);
+  };
+
+  // Handle closing the HP loss modal
+  const handleCloseHpLossModal = () => {
+    setHpLossModalOpen(false);
     setNotification(null);
   };
 
@@ -179,7 +188,9 @@ const UserCard: React.FC = () => {
               }}
               size={"25px"}
             />
-            <Text fontSize={{ base: "lg", md: "xl" }}>Daily Streak {user.streak}</Text>
+            <Text fontSize={{ base: "lg", md: "xl" }}>
+              Daily Streak {user.streak}
+            </Text>
           </Box>
           <Box display="flex" alignItems="center" justifyContent="center">
             <HeartFill
@@ -240,17 +251,64 @@ const UserCard: React.FC = () => {
       {/* Level-Up Modal */}
       <Modal isOpen={isLevelUpModalOpen} onClose={handleCloseLevelUpModal}>
         <ModalOverlay />
-        <ModalContent backgroundColor="#1A202C" color="white" borderRadius="2xl">
-          <ModalHeader fontFamily="'Orbitron'" textAlign="center" fontSize="2xl" color="yellow.300">
+        <ModalContent
+          backgroundColor="#1A202C"
+          color="white"
+          borderRadius="2xl"
+        >
+          <ModalHeader
+            fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
+            textAlign="center"
+            fontSize="2xl"
+            color="yellow.300"
+          >
             🎉 Level Up! 🎉
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text fontSize="xl" textAlign="center" mb={4}>
-              Congratulations, {user?.username}! You’ve reached Level {user?.level}.
+              Congratulations, {user?.username}! You’ve reached Level{" "}
+              {user?.level}.
             </Text>
             <Text fontSize="xl" textAlign="center">
               Keep up the great work!
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="cyan" onClick={handleCloseLevelUpModal}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* HP Loss Modal */}
+      <Modal isOpen={isHpLossModalOpen} onClose={handleCloseHpLossModal}>
+        <ModalOverlay />
+        <ModalContent
+          backgroundColor="#1A202C"
+          color="white"
+          borderRadius="2xl"
+        >
+          <ModalHeader
+            fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
+            textAlign="center"
+            fontSize="2xl"
+            color="red.500"
+          >
+            ⚠️ HP Loss! ⚠️
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text fontSize="xl" textAlign="center" mb={4}>
+              {user?.username}, you missed some habits yesterday, and made you
+              lose some HP. Stay on track and keep up with your habits to
+              restore your health!
+            </Text>
+            <Text fontSize="xl" textAlign="center" mb={4}>
+              Don't let your HP drop to 0, or you might end-up losing your XP!
+            </Text>
+            <Text fontSize="xl" textAlign="center">
+              Keep up the great work, and don't lose focus!
             </Text>
           </ModalBody>
           <ModalFooter>

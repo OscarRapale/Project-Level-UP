@@ -1,6 +1,14 @@
-import { Box, Grid, GridItem, HStack, Link, Text, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  Grid,
+  GridItem,
+  HStack,
+  Link,
+  Text,
+  Heading,
+} from "@chakra-ui/react";
 import { Github, Linkedin } from "react-bootstrap-icons";
-import './AboutUsPage.css';
+import "./AboutUsPage.css";
 import { useEffect } from "react";
 
 const AboutUsPage = () => {
@@ -55,10 +63,13 @@ const AboutUsPage = () => {
             About Us
           </Heading>
           <Text mb={4}>
-            Welcome to <strong>Level-UP</strong>, your daily habit tracker with
-            a twist! Our app helps you build healthy routines by turning your
-            daily tasks into a game where you gain experience points (XP) as you
-            complete your habits.
+            Welcome to{" "}
+            <Link href="https://github.com/OscarRapale/Project-Level-UP/tree/main" isExternal>
+              <strong>Level-UP</strong>
+            </Link>
+            , your daily habit tracker with a twist! Our app helps you build
+            healthy routines by turning your daily tasks into a game where you
+            gain experience points (XP) as you complete your habits.
           </Text>
           <Text mb={4}>
             But there's a challenge—complete your habits before the daily
@@ -68,7 +79,10 @@ const AboutUsPage = () => {
             habits!
           </Text>
           <Text mb={4}>
-            <strong>Level-UP</strong> is developed by a group of students from{" "}
+            <Link href="https://github.com/OscarRapale/Project-Level-UP/tree/main" isExternal>
+              <strong>Level-UP</strong>
+            </Link>{" "}
+            is developed by a group of students from{" "}
             <strong>Holberton Coding School Puerto Rico</strong>. We're
             passionate about using technology to help people improve their
             lives, one habit at a time.
@@ -102,11 +116,7 @@ const AboutUsPage = () => {
           fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
           animation="float 3s ease-in-out infinite"
         >
-          <Heading
-           as="h2"
-           mb={4}
-           fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
-           >
+          <Heading as="h2" mb={4} fontFamily="'Orbitron', 'Exo 2', 'Lexend'">
             Oscar Rapale
           </Heading>
           <Text mb={2}>Gamification Logic</Text>
@@ -144,11 +154,7 @@ const AboutUsPage = () => {
           fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
           animation="float 3s ease-in-out infinite"
         >
-          <Heading
-           as="h2"
-           mb={4}
-           fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
-           >
+          <Heading as="h2" mb={4} fontFamily="'Orbitron', 'Exo 2', 'Lexend'">
             Julio Pérez
           </Heading>
           <Text mb={2}>Back-end Developer</Text>
@@ -158,7 +164,10 @@ const AboutUsPage = () => {
             <Link href="https://github.com/julioperez15" isExternal>
               <Github size="2em" />
             </Link>
-            <Link href="https://www.linkedin.com/in/julio-p%C3%A9rez-a90802330/" isExternal>
+            <Link
+              href="https://www.linkedin.com/in/julio-p%C3%A9rez-a90802330/"
+              isExternal
+            >
               <Linkedin size="2em" />
             </Link>
           </HStack>
@@ -186,11 +195,7 @@ const AboutUsPage = () => {
           fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
           animation="float 3s ease-in-out infinite"
         >
-          <Heading
-           as="h2"
-           mb={4}
-           fontFamily="'Orbitron', 'Exo 2', 'Lexend'" 
-           >
+          <Heading as="h2" mb={4} fontFamily="'Orbitron', 'Exo 2', 'Lexend'">
             Saul Vera
           </Heading>
           <Text mb={2}>Back-end Developer</Text>
@@ -200,7 +205,10 @@ const AboutUsPage = () => {
             <Link href="https://github.com/allthatgroove89" isExternal>
               <Github size="2em" />
             </Link>
-            <Link href="https://www.linkedin.com/in/saul-vera-9014bbb0/" isExternal>
+            <Link
+              href="https://www.linkedin.com/in/saul-vera-9014bbb0/"
+              isExternal
+            >
               <Linkedin size="2em" />
             </Link>
           </HStack>

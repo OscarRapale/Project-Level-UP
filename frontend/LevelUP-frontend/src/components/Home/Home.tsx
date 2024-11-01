@@ -2,7 +2,7 @@ import "./Home.css";
 import landingPageSvg from "../../assets/landing-page1.svg";
 import landingPageMobileSvg from "../../assets/Landing-page-mobile.svg";
 import { useEffect } from "react";
-import { Box, Button, useBreakpointValue, useColorMode } from "@chakra-ui/react";
+import { Box, Text, Button, useBreakpointValue, useColorMode } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 
 const Home = () => {
@@ -15,6 +15,10 @@ const Home = () => {
     base: landingPageMobileSvg,
     md: landingPageSvg,
   });
+
+  // Determine display property based on screen size
+  const displayTextBlock = useBreakpointValue({ base: "none", md: "block" });
+
 
   return (
     <Box
@@ -29,6 +33,31 @@ const Home = () => {
         position: "relative",
       }}
     >
+      {/* Block of text explaining the app */}
+      <Box
+        position="absolute"
+        bottom="5px"
+        left="70px"
+        textAlign="left"
+        bg={colorMode === "dark" ? "blackAlpha.700" : "#333"}
+        color="white"
+        p={6}
+        borderRadius="2xl"
+        maxW="400px"
+        animation="float 3s ease-in-out infinite"
+        display={displayTextBlock} // Hide on mobile
+      >
+        <Text textAlign="center" fontFamily="'Orbitron'" fontSize="2xl" fontWeight="bold" mb={4}>
+          Welcome to Level-UP!
+        </Text>
+        <Text fontSize="lg">
+          Level-UP is a gamified habit tracker that helps you build and maintain
+          healthy habits. Track your progress, earn rewards, and level up as you
+          complete your daily tasks. Join our community and start your journey
+          to a better you!
+        </Text>
+      </Box>
+
       <Button
         fontFamily="'Orbitron'"
         fontSize="xl"
