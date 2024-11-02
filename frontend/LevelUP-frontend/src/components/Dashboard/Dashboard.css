@@ -7,3 +7,11 @@ body {
     line-height: 1.5;
     font-weight: 400;
 }
+
+.dashboard-container {
+  background-image: url('../../assets/circuit.svg');
+  background-size: 150% 160%;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}

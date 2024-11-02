@@ -3,7 +3,20 @@ import useHttpRequest from "../hooks/useHttpRequest";
 import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Habit, HabitList } from "./types";
+import {
+  Box,
+  Heading,
+  Select,
+  Alert,
+  AlertIcon,
+  List,
+  ListItem,
+  Button,
+  Text,
+  Flex,
+} from "@chakra-ui/react";
 
+// Props interface for HabitListComponent
 interface HabitListComponentProps {
   habitLists: HabitList[];
   setHabitLists: React.Dispatch<React.SetStateAction<HabitList[]>>;
@@ -21,6 +34,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     habitListId || null
   );
 
+  // HTTP request hooks for fetching preset and custom habits
   const {
     data: presetData,
     loading: presetLoading,
@@ -41,6 +55,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     method: "GET",
   });
 
+  // HTTP request hooks for completing and deleting habits
   const { sendRequest: completeHabitRequest } = useHttpRequest<
     unknown,
     unknown
@@ -57,6 +72,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     method: "DELETE",
   });
 
+  // Fetch habits when the selected habit list changes
   useEffect(() => {
     if (selectedHabitListId) {
       sendPresetRequest();
@@ -64,6 +80,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     }
   }, [selectedHabitListId, sendPresetRequest, sendCustomRequest]);
 
+  // Update habits state when preset or custom habit data is fetched
   useEffect(() => {
     if (presetData || customData) {
       const presetHabits: Habit[] = (presetData || []).map((habit) => ({
@@ -78,6 +95,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     }
   }, [presetData, customData]);
 
+  // WebSocket connection to listen for habit list updates
   useEffect(() => {
     const socket = io("http://127.0.0.1:5000");
 
@@ -107,6 +125,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     };
   }, [selectedHabitListId, setHabitLists]);
 
+  // Handle completing a habit
   const handleCompleteHabit = async (
     habitId: string,
     type: "preset" | "custom"
@@ -123,6 +142,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     }
   };
 
+  // Handle deleting a habit list
   const handleDeleteHabitList = async (habitListId: string) => {
     const url = `http://127.0.0.1:5000/habit_lists/${habitListId}`;
     try {
@@ -138,82 +158,123 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
   };
 
   return (
-    <div className="container">
-      <h2
-        className="my-4"
-        style={{ fontFamily: "'Orbitron', 'Exo 2', 'Lexend'" }}
-      >
+    <Box p={4}>
+      <Heading as="h2" mb={4} fontFamily="'Orbitron', 'Exo 2', 'Lexend'">
         Today's Habits
-      </h2>
-      <div className="mb-3">
-        <label htmlFor="habitListSelect" className="form-label">
-          Select Habit List:
-        </label>
-        <select
-          id="habitListSelect"
-          className="form-select"
+      </Heading>
+      <Box mb={3}>
+        <Text mb={2}>Select Habit List:</Text>
+        <Select
+          placeholder="Select a habit list"
           value={selectedHabitListId || ""}
           onChange={(e) => setSelectedHabitListId(e.target.value)}
         >
-          <option value="" disabled>
-            Select a habit list
-          </option>
           {habitLists.map((list) => (
             <option key={list.id} value={list.id}>
               {list.name}
             </option>
           ))}
-        </select>
-      </div>
+        </Select>
+      </Box>
       {(presetLoading || customLoading) && (
-        <div className="alert alert-info">Loading...</div>
+        <Alert status="info" mb={4}>
+          <AlertIcon />
+          Loading...
+        </Alert>
       )}
       {(presetError || customError) && (
-        <div className="alert alert-danger">{presetError || customError}</div>
+        <Alert status="error" mb={4}>
+          <AlertIcon />
+          {presetError || customError}
+        </Alert>
       )}
-      <ul className="list-group" style={{ width: "130%", height: "auto" }}>
+      <List spacing={3} mb={4}>
         {habits.length > 0 ? (
           habits.map((habit) => (
-            <li
+            <ListItem
+              className="habit-description"
               key={habit.id}
-              className="list-group-item d-flex justify-content-between align-items-center"
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              p={3}
+              bg="white"
+              color="black"
+              borderRadius="md"
+              boxShadow="md"
+              fontSize={{ base: "md", md: "xl" }}
+              h="auto"
+              flexDirection={{ base: "column", md: "row" }}
             >
-              <p className="mb-0">{habit.description}</p>
-              <button
-                className="btn btn-outline-success complete-button"
+              <Text>{habit.description}</Text>
+              <Button
+                variant="outline"
+                color="green.400"
+                borderColor="green.400"
+                _hover={{
+                  borderColor: "green.500",
+                  backgroundColor: "green.500",
+                  color: "white",
+                  textDecoration: "none",
+                }}
+                mt={{ base: 2, md: 0 }}
+                ml={{ base: 0, md: 4 }} 
                 onClick={() => handleCompleteHabit(habit.id, habit.type)}
               >
                 Complete
-              </button>
-            </li>
+              </Button>
+            </ListItem>
           ))
         ) : (
-          <li className="list-group-item">No habits found for this list.</li>
+          <ListItem>No habits found for this list.</ListItem>
         )}
-      </ul>
-      <h3
-        className="my-4"
-        style={{ fontFamily: "'Orbitron', 'Exo 2', 'Lexend'" }}
+      </List>
+      <Heading
+        as="h3"
+        textAlign="center"
+        mt={10}
+        mb={4}
+        fontFamily="'Orbitron', 'Exo 2', 'Lexend'"
       >
         Delete Habit Lists
-      </h3>
-      <ul className="list-group mt-3">
-        {habitLists.map((list) => (
-          <li
-            key={list.id}
-            className="list-group-item d-flex justify-content-between align-items-center"
-          >
-            <span>{list.name}</span>
-            <button
-              className="btn btn-outline-danger"
-              onClick={() => handleDeleteHabitList(list.id)}
+      </Heading>
+      <Flex direction="column" alignItems="center">
+        <List spacing={3} w="100%" maxW="600px">
+          {habitLists.map((list) => (
+            <ListItem
+              key={list.id}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              p={3}
+              bg="white"
+              color="black"
+              borderRadius="md"
+              boxShadow="md"
+              h="auto"
+              fontSize={{ base: "md", md: "xl" }}
+              flexDirection={{ base: "column", md: "row" }}
             >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+              <Text>{list.name}</Text>
+              <Button
+                variant="outline"
+                borderColor="red.500"
+                color="red.500"
+                _hover={{
+                  borderColor: "red.600",
+                  backgroundColor: "red.600",
+                  color: "white",
+                }}
+                mt={{ base: 2, md: 0 }}
+                onClick={() => handleDeleteHabitList(list.id)}
+              >
+                Delete
+              </Button>
+            </ListItem>
+          ))}
+        </List>
+      </Flex>
+    </Box>
   );
 };
 

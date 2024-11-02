@@ -3,12 +3,27 @@
 
 }
 
-#habits-box:hover {
+.habit-box:hover {
+    text-decoration: underline;  
+}
+
+.habits-box.dark-mode:hover {
+    color: #22d3ee;
+}
+
+.habits-box.light-mode:hover {
     color: #DC143C;
+}
+
+.habits-description:hover {
     text-decoration: underline;
 }
 
-#habits-description:hover {
+.habits-description.dark-mode:hover {
+    color: #22d3ee;
+}
+
+.habits-description.light-mode:hover {
     color: #DC143C;
 }
 

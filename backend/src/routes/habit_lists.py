@@ -361,12 +361,22 @@ def complete_preset_habit(habit_list_id: str, habit_id: str):
         habit_list_id (str): The ID of the habit list.
         habit_id (str): The ID of the preset habit to complete.
     """
+    from src.models.habit_list import HabitListItem
+
     try:
         habit_list = HabitList.query.get(habit_list_id)
         if not habit_list:
             return jsonify({"msg": f"Habit list with ID {habit_list_id} not found"}), 404
 
         habit_list.complete_preset_habit(habit_id)
+
+        # Delete the habit from the habit list
+        habit_list_item = HabitListItem.query.filter_by(habit_list_id=habit_list_id, preset_habit_id=habit_id).first()
+        if not habit_list_item:
+            return jsonify({"msg": f"Habit with ID {habit_id} not found in habit list"}), 404
+
+        db.session.delete(habit_list_item)
+        db.session.commit()
 
         # Get the current user
         current_user_id = get_jwt_identity()
@@ -399,12 +409,22 @@ def complete_custom_habit(habit_list_id: str, habit_id: str):
         habit_list_id (str): The ID of the habit list.
         habit_id (str): The ID of the custom habit to complete.
     """
+    from src.models.habit_list import HabitListItem
+
     try:
         habit_list = HabitList.query.get(habit_list_id)
         if not habit_list:
             return jsonify({"msg": f"Habit list with ID {habit_list_id} not found"}), 404
 
         habit_list.complete_custom_habit(habit_id)
+
+        # Delete the habit from the habit list
+        habit_list_item = HabitListItem.query.filter_by(habit_list_id=habit_list_id, custom_habit_id=habit_id).first()
+        if not habit_list_item:
+            return jsonify({"msg": f"Custom habit with ID {habit_id} not found in habit list"}), 404
+
+        db.session.delete(habit_list_item)
+        db.session.commit()
 
         # Get the current user
         current_user_id = get_jwt_identity()

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useHttpRequest from "../../hooks/useHttpRequest";
-import "./CategoryContainer.css";
 import { io } from "socket.io-client";
+import "./CategoryContainer.css";
 import {
   Accordion,
   AccordionItem,
@@ -12,23 +12,34 @@ import {
   Checkbox,
   Button,
   Select,
+  useColorMode,
+  Heading,
+  Text,
+  Alert,
+  AlertIcon,
+  Spinner,
+  Flex,
 } from "@chakra-ui/react";
 
+// Interface for Category
 interface Category {
   name: string;
 }
 
+// Interface for PresetHabit
 interface PresetHabit {
   id: string;
   description: string;
 }
 
+// Interface for HabitList
 interface HabitList {
   id: string;
   name: string;
 }
 
 const CategoryContainer: React.FC = () => {
+  // State variables
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [presetHabits, setPresetHabits] = useState<PresetHabit[]>([]);
@@ -41,6 +52,7 @@ const CategoryContainer: React.FC = () => {
   const [addHabitSuccess, setAddHabitSuccess] = useState<boolean>(false);
   const [isFetchingHabits, setIsFetchingHabits] = useState<boolean>(false);
 
+  // Fetch categories
   const {
     data: categoryData,
     loading: categoryLoading,
@@ -51,6 +63,7 @@ const CategoryContainer: React.FC = () => {
     method: "GET",
   });
 
+  // Fetch preset habits for the selected category
   const {
     data: presetHabitData,
     error: presetHabitError,
@@ -60,6 +73,7 @@ const CategoryContainer: React.FC = () => {
     method: "GET",
   });
 
+  // Fetch habit lists for the user
   const {
     data: habitListData,
     loading: habitListLoading,
@@ -70,12 +84,16 @@ const CategoryContainer: React.FC = () => {
     method: "GET",
   });
 
+  // Add selected habits to the selected habit list
   const { sendRequest: addHabitsRequest } = useHttpRequest({
     url: `http://127.0.0.1:5000/habit_lists/${selectedHabitListId}/habits`,
     method: "POST",
     body: { preset_habit_ids: selectedHabits },
   });
 
+  const { colorMode } = useColorMode();
+
+  // WebSocket connection to listen for habit list creation events
   useEffect(() => {
     const socket = io("http://127.0.0.1:5000");
 
@@ -85,20 +103,23 @@ const CategoryContainer: React.FC = () => {
 
     return () => {
       socket.disconnect();
-    }
+    };
   }, []);
 
+  // Fetch categories and habit lists on component mount
   useEffect(() => {
     fetchCategories();
     fetchHabitLists();
   }, [fetchCategories, fetchHabitLists]);
 
+  // Update categories state when category data is fetched
   useEffect(() => {
     if (categoryData) {
       setCategories(categoryData);
     }
   }, [categoryData]);
 
+  // Fetch preset habits when a category is selected
   useEffect(() => {
     if (selectedCategory) {
       setIsFetchingHabits(true);
@@ -106,6 +127,7 @@ const CategoryContainer: React.FC = () => {
     }
   }, [selectedCategory, fetchPresetHabits]);
 
+  // Update preset habits state when preset habit data is fetched
   useEffect(() => {
     if (presetHabitData) {
       setPresetHabits(presetHabitData);
@@ -113,17 +135,20 @@ const CategoryContainer: React.FC = () => {
     }
   }, [presetHabitData]);
 
+  // Update habit lists state when habit list data is fetched
   useEffect(() => {
     if (habitListData) {
       setHabitLists(habitListData);
     }
   }, [habitListData]);
 
+  // Handle category click
   const handleCategoryClick = (categoryName: string) => {
     setSelectedCategory(categoryName);
     setPresetHabits([]); // Clear the previous habits
   };
 
+  // Handle checkbox change for selecting habits
   const handleCheckboxChange = (habitId: string) => {
     setSelectedHabits((prevSelected) =>
       prevSelected.includes(habitId)
@@ -132,6 +157,7 @@ const CategoryContainer: React.FC = () => {
     );
   };
 
+  // Handle adding selected habits to the selected habit list
   const handleAddHabitsToList = async () => {
     if (!selectedHabitListId) {
       setAddHabitError("Please select a habit list first.");
@@ -149,29 +175,63 @@ const CategoryContainer: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2 id="category-title">Categories</h2>
-      {categoryLoading && <div>Loading...</div>}
-      {categoryError && <div>{categoryError}</div>}
-      <Accordion allowToggle id="category-accordion">
+    <Box p={4}>
+      <Heading as="h2" mb={4} fontFamily="'Orbitron', 'Exo 2', 'Lexend'">
+        Categories
+      </Heading>
+      {categoryLoading && (
+        <Alert status="info" mb={4}>
+          <AlertIcon />
+          Loading...
+        </Alert>
+      )}
+      {categoryError && (
+        <Alert status="error" mb={4}>
+          <AlertIcon />
+          {categoryError}
+        </Alert>
+      )}
+      <Accordion allowToggle>
         {categories.map((category) => (
           <AccordionItem key={category.name}>
             <h2>
               <AccordionButton
                 onClick={() => handleCategoryClick(category.name)}
               >
-                <Box flex="1" textAlign="left" id="category-name">
+                <Box
+                  flex="1"
+                  textAlign="left"
+                  fontSize="xl"
+                  className={`category-name ${
+                    colorMode === "dark" ? "dark-mode" : "light-mode"
+                  }`}
+                >
                   {category.name}
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              {isFetchingHabits && <div>Loading habits...</div>}
-              {presetHabitError && <div>{presetHabitError}</div>}
+              {isFetchingHabits && (
+                <Flex justifyContent="center" mb={4}>
+                  <Spinner />
+                  <Text ml={2}>Loading habits...</Text>
+                </Flex>
+              )}
+              {presetHabitError && (
+                <Alert status="error" mb={4}>
+                  <AlertIcon />
+                  {presetHabitError}
+                </Alert>
+              )}
               <ul>
                 {presetHabits.map((habit) => (
-                  <li key={habit.id} id="habit-description">
+                  <li
+                    key={habit.id}
+                    className={`habit-description ${
+                      colorMode === "dark" ? "dark-mode" : "light-mode"
+                    }`}
+                  >
                     <Checkbox
                       isChecked={selectedHabits.includes(habit.id)}
                       onChange={() => handleCheckboxChange(habit.id)}
@@ -185,20 +245,26 @@ const CategoryContainer: React.FC = () => {
           </AccordionItem>
         ))}
       </Accordion>
-      
-      <div id="list-select">
-        <label htmlFor="habitListSelect">My Habit Lists:</label>
-        {habitListLoading && <div>Loading lists...</div>}
-        {habitListError && <div>{habitListError}</div>}
+      <Box mt={4}>
+        <Text mb={2}>My Habit Lists:</Text>
+        {habitListLoading && (
+          <Alert status="info" mb={4}>
+            <AlertIcon />
+            Loading lists...
+          </Alert>
+        )}
+        {habitListError && (
+          <Alert status="error" mb={4}>
+            <AlertIcon />
+            {habitListError}
+          </Alert>
+        )}
         {!habitListLoading && !habitListError && (
           <Select
-            id="habitListSelect"
+            placeholder="Select a habit list"
             value={selectedHabitListId || ""}
             onChange={(e) => setSelectedHabitListId(e.target.value)}
           >
-            <option value="" disabled>
-              Select a habit list
-            </option>
             {habitLists.map((list) => (
               <option key={list.id} value={list.id}>
                 {list.name}
@@ -206,32 +272,36 @@ const CategoryContainer: React.FC = () => {
             ))}
           </Select>
         )}
-      </div>
+      </Box>
       <Box display="flex" justifyContent="center" mt={4}>
         <Button
           onClick={handleAddHabitsToList}
           disabled={selectedHabits.length === 0}
           variant="outline"
-          borderColor="red.800"
-          borderRadius="50px"
-          color="red.800"
+          borderRadius="3xl"
+          borderColor={colorMode === "dark" ? "#22d3ee" : "red.600"} // Change border color based on color mode
+          color={colorMode === "dark" ? "#22d3ee" : "red.600"} // Change text color based on color mode
           _hover={{
-            bg: "red.800",
-            color: "white"
+            bg: colorMode === "dark" ? "#22d3ee" : "red.600",
+            color: "white",
           }}
         >
           Add Selected Habits to List
         </Button>
       </Box>
       {addHabitSuccess && (
-        <div className="alert alert-success mt-3">
+        <Alert status="success" mt={4} bg="green.400" borderRadius="lg">
+          <AlertIcon />
           Habits added successfully!
-        </div>
+        </Alert>
       )}
       {addHabitError && (
-        <div className="alert alert-danger mt-3">{addHabitError}</div>
+        <Alert status="error" mt={4}>
+          <AlertIcon />
+          {addHabitError}
+        </Alert>
       )}
-    </div>
+    </Box>
   );
 };
 

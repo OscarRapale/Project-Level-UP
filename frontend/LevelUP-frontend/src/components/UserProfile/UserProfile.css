@@ -1,0 +1,7 @@
+.user-profile-container {
+  background-image: url('../../assets/circuit.svg');
+  background-size: 170% 190%;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
