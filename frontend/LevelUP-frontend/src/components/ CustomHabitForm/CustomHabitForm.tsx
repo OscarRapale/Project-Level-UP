@@ -111,7 +111,7 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
         </Alert>
       )}
       {error && <Alert status="error" mt={3}><AlertIcon />{error}</Alert>}
-      {data && <Alert status="success" mt={3}>Habit created successfully!</Alert>}
+      {data && <Alert status="success" bg="green.300" mt={3}>Habit created successfully!</Alert>}
     </Box>
   );
 };
