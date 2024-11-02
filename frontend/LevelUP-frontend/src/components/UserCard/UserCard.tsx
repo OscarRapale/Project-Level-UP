@@ -143,7 +143,7 @@ const UserCard: React.FC = () => {
       animation="float 3s ease-in-out infinite"
     >
       {notification && (
-        <Alert status="success" mb={4}>
+        <Alert status="success" mb={4} bg="green.300">
           <AlertIcon />
           {notification}
         </Alert>
