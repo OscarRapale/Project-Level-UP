@@ -1,0 +1,19 @@
+# Use Node.js for development environment
+FROM node:18 AS dev
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json, then install dependencies
+COPY frontend/LevelUP-frontend/package.json frontend/LevelUP-frontend/package-lock.json ./
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the Vite dev server port (usually 5173)
+EXPOSE 5173
+
+# Start the Vite development server
+CMD ["npm", "run", "dev"]
+
