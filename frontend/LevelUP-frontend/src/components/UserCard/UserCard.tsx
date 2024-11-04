@@ -275,7 +275,7 @@ const UserCard: React.FC = () => {
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="cyan" onClick={handleCloseLevelUpModal}>
+            <Button colorScheme="yellow.300" onClick={handleCloseLevelUpModal}>
               Close
             </Button>
           </ModalFooter>
