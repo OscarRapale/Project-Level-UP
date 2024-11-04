@@ -1,12 +1,14 @@
 from src import create_app, socketio
-from src.config import get_config
 from src.models import db
 
-app = create_app(get_config())
+app = create_app()
 
+# Ensure the database tables are created
 with app.app_context():
-    db.create_all()  # Ensure the database tables are created
+    db.create_all()
 
 if __name__ == "__main__":
     # Run the Flask development server with SocketIO support
-    socketio.run(app, debug=app.config['DEBUG'])
+    socketio.run(app, host='0.0.0.0', port=5000)
+
+

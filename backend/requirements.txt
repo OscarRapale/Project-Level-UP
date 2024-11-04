@@ -4,5 +4,8 @@ Flask_SQLAlchemy
 SQLAlchemy
 Flask-JWT-Extended
 Flask-Bcrypt
+Flask-SocketIO
+pytz
+psycopg2-binary
 python-dotenv
 gunicorn
