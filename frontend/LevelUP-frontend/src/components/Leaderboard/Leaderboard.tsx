@@ -62,10 +62,9 @@ const Leaderboard: React.FC = () => {
       borderRadius="md"
       boxShadow="lg"
       w={{ base: "100%", md: "80%" }}
-      h="auto"
+      h="150vh"
       m="auto"
       mt={{ base: "2rem", md: "10rem" }}
-      maxH="80vh"
       overflowY="auto"
       marginBottom="150px"
       className="leaderboard-container"
