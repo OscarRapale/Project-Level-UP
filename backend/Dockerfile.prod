@@ -1,0 +1,24 @@
+# Use the official Python image with minimal packages
+FROM python:3.10-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file and install dependencies
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install additional production dependencies for WebSocket handling
+RUN pip install gunicorn eventlet alembic
+
+# Copy the rest of the app code
+COPY backend/ ./
+
+# Expose the port the app runs on
+EXPOSE 5000
+
+# Set environment variable for production
+ENV ENV=production
+
+# Run the application with gunicorn and eventlet for production
+CMD ["gunicorn", "-k", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:app"]
