@@ -75,7 +75,7 @@ class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
-        "postgresql://user:password@localhost/level_up_prod"
+        "postgresql://level_up_admin:level_up617@database/level_up_prod"
     )
 
 
