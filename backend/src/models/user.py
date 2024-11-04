@@ -1,4 +1,5 @@
 from . import db
+from src import bcrypt
 from flask_bcrypt import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
@@ -38,7 +39,7 @@ class User(db.Model):
         """
         super().__init__(**kw)
         self.email = email
-        self.password_hash = generate_password_hash(password)
+        self.set_password(password)
         self.username = username
         self.is_admin = is_admin
         self.level = 1
@@ -68,13 +69,13 @@ class User(db.Model):
         """
         Set the password for the User instance.
         """
-        self.password_hash = generate_password_hash(password).decode("utf-8")
+        self.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
 
     def check_password(self, password):
         """
         Check if the provided password matches the User's password.
         """
-        return check_password_hash(self.password_hash, password)
+        return bcrypt.check_password_hash(self.password_hash, password)
     
     def gain_xp(self, amount: int) -> None:
         """
