@@ -1,8 +1,0 @@
-# Ignore __pycache__ directories
-__pycache__/
-
-# Ignore hashed password file in a specific directory
-level_up.db-x-users-4-password_hash.bin
-
-# Ignore populate_db.py file in the backend directory
-populate_db.py
