@@ -1,4 +1,5 @@
 from . import db
+from src import bcrypt
 from flask_bcrypt import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
@@ -31,14 +32,14 @@ class User(db.Model):
 
     habit_lists = db.relationship("HabitList", back_populates="list_owner")
     custom_habits = db.relationship("CustomHabit", back_populates="habit_owner")
-
+    
     def __init__(self, email: str, password: str, username: str, is_admin: bool = False, **kw):
         """
         Initialize a new User instance.
         """
         super().__init__(**kw)
         self.email = email
-        self.password_hash = generate_password_hash(password)
+        self.set_password(password)
         self.username = username
         self.is_admin = is_admin
         self.level = 1
@@ -63,19 +64,19 @@ class User(db.Model):
         Return a string representation of the User instance.
         """
         return f"<User {self.username}, Level ({self.level})>"
-
+    
     def set_password(self, password):
         """
         Set the password for the User instance.
         """
-        self.password_hash = generate_password_hash(password).decode("utf-8")
+        self.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
 
     def check_password(self, password):
         """
         Check if the provided password matches the User's password.
         """
-        return check_password_hash(self.password_hash, password)
-
+        return bcrypt.check_password_hash(self.password_hash, password)
+    
     def gain_xp(self, amount: int) -> None:
         """
         Increase the User's experience points by a certain amount.
@@ -97,7 +98,7 @@ class User(db.Model):
             self.level_up()
 
         repo.save(self)
-
+    
     def level_up(self) -> None:
         """
         Increase the User's level by 1.
@@ -115,13 +116,13 @@ class User(db.Model):
         self.luck += 1
         self.xp_to_next_level = self.calculate_xp_to_next_level() # Calculate and increase xp needed for next level.
         repo.save(self)
-
+    
     def calculate_xp_to_next_level(self) -> int:
         """
         Calculate the experience points needed to reach the next level.
         """
         return 100 + (self.level - 1) * 50
-
+    
     def recover_hp(self, hp_points=15):
         """
         Recover HP after completing habits on time
@@ -146,7 +147,7 @@ class User(db.Model):
         self.hp -= hp_points
         if self.hp < 0:
             self.hp = 0 # Ensure HP doesn't drop below 0
-
+            
         repo.save(self)
 
     def lose_xp(self, xp_points=50):
@@ -188,11 +189,11 @@ class User(db.Model):
             # Streak is broken if the last login was more than 1 day ago
             elif last_login_date < last_reset:
                 self.streak = 1  # Reset streak back to 1
-
+        
         else:
             # First login, streak will start
             self.streak = 1
-
+        
         self.streak = max(self.streak, 1) # Prevent decreasing below 1
 
         # Update last login to the current time
@@ -225,7 +226,7 @@ class User(db.Model):
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }
-
+    
     @classmethod
     def get_leaderboard(cls, limit=10):
         """
@@ -269,13 +270,13 @@ class User(db.Model):
                 raise ValueError("User already exists")
             if u.username == user["username"]:
                 raise ValueError("Username already taken")
-
+            
         new_user = User(**user)
 
         repo.save(new_user)
 
         return new_user
-
+    
     @staticmethod
     def update(user_id: str, data: dict) -> "User | None":
         """
@@ -287,7 +288,7 @@ class User(db.Model):
 
         if not user:
             return None
-
+        
         if "email" in data:
             user.email = data["email"]
         if "username" in data:

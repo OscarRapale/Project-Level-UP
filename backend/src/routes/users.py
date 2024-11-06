@@ -5,9 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from src import socketio
 from src.persistence import repo
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from datetime import datetime
 import json
-from src import db
+from datetime import datetime
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -56,6 +55,7 @@ def create_user():
 
     :return: The created user and a 201 status code.
     """
+
     data = request.get_json()
 
     if "password" not in data:
@@ -154,7 +154,7 @@ def update_user(user_id: str):
 @jwt_required()
 def delete_user(user_id: str):
     """Deletes a user by ID"""
-    
+
     current_user_id = get_jwt_identity()
     current_user = User.get(current_user_id)
 
@@ -163,11 +163,11 @@ def delete_user(user_id: str):
         abort(403, "You are not authorized to delete users.")
 
     try:
-        db.session.delete(User)
-        db.session.commit()
-        return jsonify({"msg":f"User with ID{user_id}deleted successfully"}), 200
+        if not User.delete(user_id):
+            abort(404, f"User with ID {user_id} not found")
     except SQLAlchemyError as e:
         abort(500, f"Database error: {e}")
+
     return "", 204
 
 @users_bp.route("/leaderboard", methods=["GET"])

@@ -51,7 +51,7 @@ def get_habit_lists():
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
-
+    
     habit_lists: list[HabitList] = HabitList.get_all()
 
     return [habit_list.to_dict() for habit_list in habit_lists], 200

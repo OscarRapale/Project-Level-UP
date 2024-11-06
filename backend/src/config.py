@@ -38,7 +38,7 @@ class DevelopmentConfig(Config):
     ```
     """
 
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///app/data/level_up.db")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///level_up.db")
     DEBUG = True
 
 
@@ -75,21 +75,14 @@ class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
-        "postgresql://user:password@localhost/level_up_prod"
+        "postgresql://level_up_admin:level_up617@database/level_up_prod"
     )
 
 
 def get_config():
-    """
-    Get the configuration class based on the environment
-    """
-    env = os.getenv('ENV', 'development')
-    if env == 'development':
-        return DevelopmentConfig
+    env = os.environ.get('ENV', 'development')
+    if env == 'production':
+        return ProductionConfig()
     elif env == 'testing':
-        return TestingConfig
-    elif env == 'production':
-        return ProductionConfig
-    else:
-        raise ValueError(f"Invalid environment name: {env}")
-
+        return TestingConfig()
+    return DevelopmentConfig()

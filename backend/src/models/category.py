@@ -7,7 +7,7 @@ class Category(db.Model):
 
     __tablename__ = "categories"
 
-    name = db.Column(db.String(128), primary_key=True, nullable=False)
+    name = db.Column(db.String(128), primary_key=True, unique=True, nullable=False)
     habits = db.relationship("PresetHabit", back_populates="category")
 
     def __init__(self, name: str, **kw) -> None:

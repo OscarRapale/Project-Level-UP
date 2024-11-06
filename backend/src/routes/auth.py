@@ -25,11 +25,10 @@ def login():
 
     if user and bcrypt.check_password_hash(user.password_hash, password):
         additional_claims = {"is_admin": user.is_admin}
-        #expires = timedelta(hours=1)
-        access_token = create_access_token(identity=user.id, additional_claims=additional_claims,
-                                           expires_delta=False) # Token does not expires while in Development
+        expires = timedelta(hours=1)
+        access_token = create_access_token(identity=user.id, additional_claims=additional_claims, 
+                                           expires_delta=expires)
         user.check_daily_streak()  # Update user streak and login count
-
         return jsonify(access_token=access_token, user_id=user.id ), 200
-
+    
     return jsonify({"msg": "Bad email or password"}), 401
