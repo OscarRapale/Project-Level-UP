@@ -20,5 +20,5 @@ def admin_data():
     claims = get_jwt()
     if not claims.get("is_admin"):
         return jsonify({"msg": "Administration rights required"}), 403
-    
+
     return jsonify({"msg": "Admin access granted"}), 200

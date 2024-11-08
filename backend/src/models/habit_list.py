@@ -46,7 +46,7 @@ class HabitList(db.Model):
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }
-    
+
     def check_deadline_and_complete_habit(self, habit_list_item, xp_reward):
         """
         Check if the habit is completed before the daily deadline and update the habit status.
@@ -98,7 +98,7 @@ class HabitList(db.Model):
 
             self.list_owner.gain_xp(xp_reward)
             self.list_owner.recover_hp(hp_points=15)
-       
+
         repo.save(self)
         repo.save(habit_list_item)
 
@@ -158,13 +158,13 @@ class HabitList(db.Model):
         from src.persistence import repo
 
         habit_list_item = HabitListItem.query.filter_by(habit_list_id=self.id, preset_habit_id=habit_id).first()
-        
+
         if not habit_list_item:
             raise ValueError(f"Habit with ID {habit_id} not found in Habit List")
-        
+
         if habit_list_item.habit_is_completed:
             raise ValueError(f"Habit with ID {habit_id} is already completed")
-        
+
         # Handle deadline and completion
         self.check_deadline_and_complete_habit(habit_list_item,
                                                 habit_list_item.preset_habit.xp_reward)
@@ -179,17 +179,16 @@ class HabitList(db.Model):
         from src.persistence import repo
 
         habit_list_item = HabitListItem.query.filter_by(habit_list_id=self.id, custom_habit_id=habit_id).first()
-        
+
         if not habit_list_item:
             raise ValueError(f"Habit with ID {habit_id} not found in Habit List")
-        
+
         if habit_list_item.habit_is_completed:
             raise ValueError(f"Habit with ID {habit_id} is already completed")
-        
+
         # Handle deadline and completion
         self.check_deadline_and_complete_habit(habit_list_item,
                                                 habit_list_item.custom_habit.xp_reward)
-    
 
     @staticmethod
     def create(data: dict) -> "HabitList":
@@ -202,14 +201,14 @@ class HabitList(db.Model):
 
         if not user:
             raise ValueError(f"User with ID {data['list_owner_id']} not found")
-        
+
         new_habit_list = HabitList(name=data["name"], list_owner_id=data["list_owner_id"])
 
         db.session.add(new_habit_list)
         db.session.commit()
 
         return new_habit_list
-    
+
     @staticmethod
     def update(habit_list_id: str, data: dict) -> "HabitList | None":
         """
@@ -221,7 +220,7 @@ class HabitList(db.Model):
 
         if not habit_list:
             return None
-        
+
         for key, value in data.items():
             setattr(habit_list, key, value)
 
@@ -247,6 +246,28 @@ class HabitList(db.Model):
         if not habit_list:
             return False
         
+        repo.delete(habit_list)
+
+        return True
+
+    @staticmethod
+    def delete(habit_list_id: str) -> bool:
+        """
+        Delete a HabitList instance from the database.
+
+        Args:
+            habit_list_id (str): The ID of the habit list to be deleted.
+
+        Returns:
+            bool: True if the habit list was deleted, False if not found.
+        """
+        from src.persistence import repo
+
+        habit_list: HabitList | None = HabitList.get(habit_list_id)
+
+        if not habit_list:
+            return False
+
         repo.delete(habit_list)
 
         return True
@@ -330,7 +351,7 @@ class HabitListItem(db.Model):
                 and (custom_habit_id is None or habit_list_item.custom_habit_id == custom_habit_id)
             ):
                 return habit_list_item
-            
+
         return None
 
     @staticmethod
@@ -365,11 +386,11 @@ class HabitListItem(db.Model):
 
         if not habit_list_item:
             return False
-        
+
         repo.delete(habit_list_item)
 
         return True
-    
+
     @staticmethod
     def update(entity_id: str, data: dict):
         """Not implemented for now"""

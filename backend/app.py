@@ -10,5 +10,3 @@ with app.app_context():
 if __name__ == "__main__":
     # Run the Flask development server with SocketIO support
     socketio.run(app, host='0.0.0.0', port=5000)
-
-

@@ -55,7 +55,7 @@ class PresetHabit(db.Model):
 
         if not category:
             raise ValueError("Category not found")
-        
+
         preset_habit = PresetHabit(**data)
         repo.save(preset_habit)
 
@@ -72,7 +72,7 @@ class PresetHabit(db.Model):
 
         if not preset_habit:
             raise ValueError("Habit not found")
-        
+
         for key, value in data.items():
             setattr(preset_habit, key, value)
 
