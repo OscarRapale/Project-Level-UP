@@ -54,6 +54,11 @@ const Login = () => {
   const { setUserId } = useUser();
   const { colorMode } = useColorMode();
 
+  // Set the document title when the component mounts
+  useEffect(() => {
+    document.title = "Level-UP | Login";
+  }, []);
+
   // Handle input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;

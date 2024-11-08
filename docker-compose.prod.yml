@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.prod
+    env_file:
+      - .env
+    environment:
+      - ENV=production
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/LevelUP-frontend/Dockerfile.prod
+    ports:
+      - "80:80"  # Exposing NGINX on the default port 80 for production
+    depends_on:
+      - backend
+
+  database:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: level_up_admin
+      POSTGRES_PASSWORD: level_up617
+      POSTGRES_DB: level_up_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
