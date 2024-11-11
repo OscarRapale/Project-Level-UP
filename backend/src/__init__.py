@@ -7,7 +7,6 @@ from flask_socketio import SocketIO
 from dotenv import load_dotenv
 
 cors = CORS()
-
 jwt = JWTManager()
 bcrypt = Bcrypt()
 socketio = SocketIO()
@@ -35,7 +34,7 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    socketio.init_app(app, cors_allowed_origins=["https://project-level-up-frontend.onrender.com"])
 
     register_extensions(app)
     register_routes(app)
@@ -52,11 +51,10 @@ def create_db_tables(app: Flask) -> None:
 
 def register_extensions(app: Flask) -> None:
     """Register the extensions for the Flask app"""
-    cors.init_app(app, resources={r"/*": {"origins": "*"}})
+    cors.init_app(app, resources={r"/*": {"origins": ["https://project-level-up-frontend.onrender.com"]}})
 
 def register_routes(app: Flask) -> None:
     """Import and register the routes for the Flask app"""
-
     #Importing the routes
     from src.routes.users import users_bp
     from src.routes.categories import categories_bp
@@ -79,12 +77,9 @@ def register_handlers(app: Flask) -> None:
     """Register the error handlers for the Flask app."""
     app.errorhandler(404)(lambda e: (
         {"error": "Not found", "message": str(e)}, 404
-    )
-    )
+    ))
     app.errorhandler(400)(
         lambda e: (
             {"error": "Bad request", "message": str(e)}, 400
         )
     )
-
-
