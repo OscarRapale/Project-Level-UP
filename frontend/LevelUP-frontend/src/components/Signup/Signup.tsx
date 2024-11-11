@@ -46,7 +46,7 @@ const Signup = () => {
     { message: string },
     SignupData
   >({
-    url: "http://127.0.0.1:5000/users",
+    url: "https://project-level-up-1.onrender.com//users",
     method: "POST",
     body: formData,
   });
