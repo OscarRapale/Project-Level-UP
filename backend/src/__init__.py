@@ -34,7 +34,7 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    socketio.init_app(app, cors_allowed_origins=["https://project-level-up-frontend.onrender.com"])
+    socketio.init_app(app, cors_allowed_origins=["https://level-up-xp.onrender.com"])
 
     register_extensions(app)
     register_routes(app)
@@ -51,7 +51,7 @@ def create_db_tables(app: Flask) -> None:
 
 def register_extensions(app: Flask) -> None:
     """Register the extensions for the Flask app"""
-    cors.init_app(app, resources={r"/*": {"origins": ["https://project-level-up-frontend.onrender.com"]}})
+    cors.init_app(app, resources={r"/*": {"origins": ["https://level-up-xp.onrender.com"]}})
 
 def register_routes(app: Flask) -> None:
     """Import and register the routes for the Flask app"""
