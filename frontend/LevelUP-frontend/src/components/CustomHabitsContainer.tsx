@@ -15,7 +15,7 @@ const CustomHabitsContainer: React.FC = () => {
 
   // HTTP request hook for fetching user habits
   const { sendRequest: fetchHabits } = useHttpRequest<Habit[], unknown>({
-    url: "http://127.0.0.1:5000/custom_habits/user_habits",
+    url: "https://level-up-backend-x0lt.onrender.com//custom_habits/user_habits",
     method: "GET",
   });
 

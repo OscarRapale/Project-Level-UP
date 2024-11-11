@@ -56,7 +56,7 @@ const UserCard: React.FC = () => {
     error: userError,
     sendRequest: fetchUser,
   } = useHttpRequest<User, unknown>({
-    url: `http://127.0.0.1:5000/users/${userId}`,
+    url: `https://level-up-backend-x0lt.onrender.com//users/${userId}`,
     method: "GET",
   });
 
@@ -78,7 +78,7 @@ const UserCard: React.FC = () => {
 
   // WebSocket connection to listen for user updates
   useEffect(() => {
-    const socket = io("http://127.0.0.1:5000");
+    const socket = io("https://level-up-backend-x0lt.onrender.com/");
 
     socket.on("connect", () => {
       console.log("Connected to WebSocket server");

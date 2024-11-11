@@ -27,7 +27,7 @@ const Leaderboard: React.FC = () => {
   // HTTP request hook for fetching leaderboard data
   const { data, loading, error, sendRequest } = useHttpRequest<User[], unknown>(
     {
-      url: "http://127.0.0.1:5000/users/leaderboard",
+      url: "https://level-up-backend-x0lt.onrender.com//users/leaderboard",
       method: "GET",
     }
   );

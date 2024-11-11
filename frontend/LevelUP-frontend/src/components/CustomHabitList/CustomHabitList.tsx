@@ -45,13 +45,13 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
     error: habitListError,
     sendRequest: fetchHabitLists,
   } = useHttpRequest<HabitList[], unknown>({
-    url: "http://127.0.0.1:5000/habit_lists/user",
+    url: "https://level-up-backend-x0lt.onrender.com//habit_lists/user",
     method: "GET",
   });
 
   // Add selected habits to the selected habit list
   const { sendRequest: addHabitsRequest } = useHttpRequest({
-    url: `http://127.0.0.1:5000/habit_lists/${selectedHabitListId}/custom_habits`,
+    url: `https://level-up-backend-x0lt.onrender.com//habit_lists/${selectedHabitListId}/custom_habits`,
     method: "POST",
     body: { custom_habit_ids: selectedHabits },
   });
@@ -60,7 +60,7 @@ const UserHabitContainer: React.FC<UserHabitContainerProps> = ({ habits }) => {
 
   // WebSocket connection to listen for habit list creation events
   useEffect(() => {
-    const socket = io("http://127.0.0.1:5000");
+    const socket = io("https://level-up-backend-x0lt.onrender.com/");
 
     socket.on("habit_list_created", (habitList: HabitList) => {
       setHabitLists((prevHabitLists) => [...prevHabitLists, habitList]);

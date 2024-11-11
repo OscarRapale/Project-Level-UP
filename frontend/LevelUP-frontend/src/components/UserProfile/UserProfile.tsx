@@ -68,7 +68,7 @@ const UserProfile: React.FC = () => {
     error: userError,
     sendRequest: fetchUser,
   } = useHttpRequest<User, unknown>({
-    url: `http://127.0.0.1:5000/users/${userId}`,
+    url: `https://level-up-backend-x0lt.onrender.com//users/${userId}`,
     method: "GET",
   });
 
@@ -87,7 +87,7 @@ const UserProfile: React.FC = () => {
       }
     >
   >({
-    url: `http://127.0.0.1:5000/users/${userId}`,
+    url: `https://level-up-backend-x0lt.onrender.com//users/${userId}`,
     method: "PUT",
   });
 

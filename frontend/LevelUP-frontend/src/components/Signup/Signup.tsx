@@ -46,7 +46,7 @@ const Signup = () => {
     { message: string },
     SignupData
   >({
-    url: "https://project-level-up-1.onrender.com//users",
+    url: "https://level-up-backend-x0lt.onrender.com//users",
     method: "POST",
     body: formData,
   });

@@ -17,7 +17,7 @@ const CreateHabitList: React.FC<CreateHabitListProps> = ({
   
   // HTTP request hook for creating a new habit list
   const { sendRequest } = useHttpRequest<{ id: string }, { name: string }>({
-    url: "http://127.0.0.1:5000/habit_lists",
+    url: "https://level-up-backend-x0lt.onrender.com//habit_lists",
     method: "POST",
     body: { name: habitListName },
   });

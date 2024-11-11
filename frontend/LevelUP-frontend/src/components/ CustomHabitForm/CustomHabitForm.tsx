@@ -27,7 +27,7 @@ const CustomHabitForm: React.FC<CustomHabitFormProps> = ({ onHabitCreated }) => 
     { id: string; description: string },
     { description: string }
   >({
-    url: "http://127.0.0.1:5000/custom_habits",
+    url: "https://level-up-backend-x0lt.onrender.com//custom_habits",
     method: "POST",
   });
 

@@ -41,7 +41,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     error: presetError,
     sendRequest: sendPresetRequest,
   } = useHttpRequest<Habit[], unknown>({
-    url: `http://127.0.0.1:5000/habit_lists/${selectedHabitListId}/habits`,
+    url: `https://level-up-backend-x0lt.onrender.com//habit_lists/${selectedHabitListId}/habits`,
     method: "GET",
   });
 
@@ -51,7 +51,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     error: customError,
     sendRequest: sendCustomRequest,
   } = useHttpRequest<Habit[], unknown>({
-    url: `http://127.0.0.1:5000/habit_lists/${selectedHabitListId}/custom_habits`,
+    url: `https://level-up-backend-x0lt.onrender.com//habit_lists/${selectedHabitListId}/custom_habits`,
     method: "GET",
   });
 
@@ -97,7 +97,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
 
   // WebSocket connection to listen for habit list updates
   useEffect(() => {
-    const socket = io("http://127.0.0.1:5000");
+    const socket = io("https://level-up-backend-x0lt.onrender.com/");
 
     socket.on("connect", () => {
       console.log("Connected to WebSocket server");
@@ -130,7 +130,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
     habitId: string,
     type: "preset" | "custom"
   ) => {
-    const url = `http://127.0.0.1:5000/habit_lists/${selectedHabitListId}/${
+    const url = `https://level-up-backend-x0lt.onrender.com//habit_lists/${selectedHabitListId}/${
       type === "preset" ? "habits" : "custom_habits"
     }/${habitId}/complete`;
     try {
@@ -144,7 +144,7 @@ const HabitListComponent: React.FC<HabitListComponentProps> = ({
 
   // Handle deleting a habit list
   const handleDeleteHabitList = async (habitListId: string) => {
-    const url = `http://127.0.0.1:5000/habit_lists/${habitListId}`;
+    const url = `https://level-up-backend-x0lt.onrender.com//habit_lists/${habitListId}`;
     try {
       await deleteHabitListRequest({ url });
       onHabitListDeleted(habitListId);
