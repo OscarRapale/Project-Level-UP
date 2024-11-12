@@ -31,9 +31,9 @@ services:
   database:
     image: postgres:13
     environment:
-      POSTGRES_USER: level_up_admin
-      POSTGRES_PASSWORD: level_up617
-      POSTGRES_DB: level_up_prod
+      POSTGRES_USER: levelup_admin
+      POSTGRES_PASSWORD: aF9PaS5R3gIQn3y0WaGcrYbp6Wq6CxlQ
+      POSTGRES_DB: levelup_renderdb
     ports:
       - "5432:5432"
     volumes:

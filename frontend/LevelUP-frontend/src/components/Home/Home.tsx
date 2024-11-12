@@ -65,14 +65,14 @@ const Home = () => {
         marginRight={{ base: "10px", md: "96px" }}
         marginBottom="25px"
         as={RouterLink}
-        to="/dashboard"
+        to="/login"
         borderRadius="3xl"
         w="320px"
         backgroundColor={colorMode === "dark" ? "green.400" : "#22d3ee"}
         borderColor={colorMode === "dark" ? "green.400" : "#22d3ee"} // Change border color based on color mode
         color="white"
       >
-        Explore
+        Login
       </Button>
 
       <Button
