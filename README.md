@@ -37,12 +37,12 @@ Chakra UI,
 Axios, 
 Sockets.io, 
 
-Containerization and Orchestration
+Containerization and Orchestration:
 
 Docker, 
-Docker Compose, 
+Docker Compose
 
-Deployment
+Deployment:
 
 Render
 
@@ -50,7 +50,7 @@ Render
 
 Oscar Rapale, 
 Saul Vera, 
-Julio Pérez,
+Julio Pérez
 
 # Try Level-UP today!
 
