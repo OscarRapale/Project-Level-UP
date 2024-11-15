@@ -22,25 +22,25 @@ Take control of your routines.
 
 Backend: 
 
-Flask
-SQLAlchemy
-Bcrypt
-JWT
-Sockets.io
-PostgreSQL
+Flask, 
+SQLAlchemy, 
+Bcrypt, 
+JWT, 
+Sockets.io, 
+PostgreSQL, 
 
 Frontend:
 
-React.js
-Bootstrap
-Chakra UI
-Axios
-Sockets.io
+React.js, 
+Bootstrap, 
+Chakra UI, 
+Axios, 
+Sockets.io, 
 
 Containerization and Orchestration
 
-Docker
-Docker Compose
+Docker, 
+Docker Compose, 
 
 Deployment
 
@@ -48,9 +48,9 @@ Render
 
 # Contributors
 
-Oscar Rapale
-Saul Vera
-Julio Pérez
+Oscar Rapale, 
+Saul Vera, 
+Julio Pérez,
 
 # Try Level-UP today!
 
